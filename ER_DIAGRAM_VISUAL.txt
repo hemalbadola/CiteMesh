@@ -1,0 +1,354 @@
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                     CiteMesh - Entity Relationship Diagram                    ║
+║                            Visual Database Schema                             ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CORE ENTITIES                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━┓                  ┏━━━━━━━━━━━━━━━━━━━━━━┓
+┃       USER           ┃                  ┃      PROFILE         ┃
+┣━━━━━━━━━━━━━━━━━━━━━━┫                  ┣━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id               ┃◄────────1:1─────┨ PK: id               ┃
+┃ firebase_uid (UNIQUE)┃                  ┃ FK: user_id          ┃
+┃ email (UNIQUE)       ┃                  ┃ bio                  ┃
+┃ full_name            ┃                  ┃ affiliation          ┃
+┃ role                 ┃                  ┃ avatar_url           ┃
+┃ is_active            ┃                  ┗━━━━━━━━━━━━━━━━━━━━━━┛
+┃ created_at           ┃
+┃ last_login_at        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━┛
+        │
+        │ 1:N (saves)
+        │
+        ▼
+┏━━━━━━━━━━━━━━━━━━━━━━┓
+┃    SAVEDPAPER        ┃
+┣━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id               ┃
+┃ FK: user_id          ┃──┐
+┃ paper_id             ┃  │
+┃ title                ┃  │
+┃ authors              ┃  │
+┃ summary              ┃  │
+┃ published_year       ┃  │
+┃ tags                 ┃  │
+┃ saved_at             ┃  │
+┗━━━━━━━━━━━━━━━━━━━━━━┛  │
+                           │
+                           │
+┌──────────────────────────┴──────────────────────────┐
+│                                                      │
+│ 1:N (creates)                        1:N (creates)  │
+│                                                      │
+▼                                                      ▼
+┏━━━━━━━━━━━━━━━━━━━━━━┓                  ┏━━━━━━━━━━━━━━━━━━━━━━┓
+┃     COLLECTION       ┃                  ┃   CITATIONLINK       ┃
+┣━━━━━━━━━━━━━━━━━━━━━━┫                  ┣━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id               ┃                  ┃ PK: id               ┃
+┃ FK: user_id          ┃                  ┃ FK: user_id          ┃
+┃ name                 ┃                  ┃ source_paper_id      ┃──┐
+┃ description          ┃                  ┃ target_paper_id      ┃  │ Graph
+┃ color                ┃                  ┃ weight               ┃  │ Edge
+┃ icon                 ┃                  ┃ note                 ┃  │
+┃ is_public            ┃                  ┃ created_at           ┃◄─┘
+┃ paper_count          ┃                  ┗━━━━━━━━━━━━━━━━━━━━━━┛
+┃ created_at           ┃
+┃ updated_at           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━┛
+        │
+        │ 1:N
+        │
+        ▼
+┏━━━━━━━━━━━━━━━━━━━━━━┓
+┃  COLLECTIONPAPER     ┃  [Junction Table for M:N]
+┣━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id               ┃
+┃ FK: collection_id    ┃
+┃ paper_id             ┃
+┃ paper_title          ┃
+┃ paper_authors        ┃
+┃ paper_year           ┃
+┃ note                 ┃
+┃ order_index          ┃
+┃ added_at             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          AI CHAT SYSTEM                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━┓
+┃       USER           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━┛
+        │
+        │ 1:N (creates sessions)
+        │
+        ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ RESEARCHCHATSESSION        ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id                     ┃
+┃ FK: user_id                ┃
+┃ title                      ┃
+┃ system_prompt              ┃
+┃ created_at                 ┃
+┃ updated_at                 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+        │
+        │ 1:N (contains messages)
+        │
+        ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ RESEARCHCHATMESSAGE        ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id                     ┃
+┃ FK: session_id             ┃
+┃ sender (user/assistant)    ┃
+┃ content                    ┃
+┃ references (JSON)          ┃
+┃ created_at                 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       COLLABORATION (MENTOR-STUDENT)                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━┓                  ┏━━━━━━━━━━━━━━━━━━━━━━┓
+┃   USER (Mentor)      ┃                  ┃  USER (Student)      ┃
+┃   role = 'mentor'    ┃                  ┃  role = 'student'    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━┛                  ┗━━━━━━━━━━━━━━━━━━━━━━┛
+        │                                           │
+        │                                           │
+        └───────────────┐       ┌──────────────────┘
+                        │       │
+                        ▼       ▼
+              ┏━━━━━━━━━━━━━━━━━━━━━━━━━┓
+              ┃  MENTORSTUDENTLINK      ┃  [M:N Junction]
+              ┣━━━━━━━━━━━━━━━━━━━━━━━━━┫
+              ┃ PK: id                  ┃
+              ┃ FK: mentor_id           ┃
+              ┃ FK: student_id          ┃
+              ┃ created_at              ┃
+              ┗━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                        │
+                        │ 1:N (generates)
+                        │
+                        ▼
+              ┏━━━━━━━━━━━━━━━━━━━━━━━━━┓
+              ┃   STUDENTACTIVITY       ┃
+              ┣━━━━━━━━━━━━━━━━━━━━━━━━━┫
+              ┃ PK: id                  ┃
+              ┃ FK: mentor_id           ┃
+              ┃ FK: student_id          ┃
+              ┃ activity_type           ┃
+              ┃ detail                  ┃
+              ┃ metric_value            ┃
+              ┃ occurred_at             ┃
+              ┗━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          READING GROUPS                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━┓
+┃   USER (Mentor)      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━┛
+        │
+        │ 1:N (creates)
+        │
+        ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃     READINGGROUP           ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id                     ┃
+┃ FK: mentor_id              ┃
+┃ name                       ┃
+┃ description                ┃
+┃ focus_area                 ┃
+┃ created_at                 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+        │
+        │ 1:N
+        │
+        ├────────────────────┐
+        │                    │
+        ▼                    ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ READINGGROUPMEMBERSHIP     ┃    ┃   READINGGROUPPOST         ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫    ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id                     ┃    ┃ PK: id                     ┃
+┃ FK: group_id               ┃    ┃ FK: group_id               ┃
+┃ FK: user_id                ┃    ┃ FK: author_id              ┃
+┃ role                       ┃    ┃ content                    ┃
+┃ joined_at                  ┃    ┃ paper_id                   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛    ┃ created_at                 ┃
+                                   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ADVANCED FEATURES (SELECTED)                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  LITERATUREREVIEW          ┃    ┃   PAPERCOMPARISON          ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫    ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id                     ┃    ┃ PK: id                     ┃
+┃ FK: user_id                ┃    ┃ FK: user_id                ┃
+┃ topic                      ┃    ┃ paper_a_id                 ┃
+┃ prompt                     ┃    ┃ paper_b_id                 ┃
+┃ content                    ┃    ┃ focus                      ┃
+┃ status                     ┃    ┃ summary                    ┃
+┃ created_at                 ┃    ┃ strengths_a                ┃
+┃ updated_at                 ┃    ┃ strengths_b                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛    ┃ created_at                 ┃
+                                   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    PAPERCLUSTER            ┃    ┃   LEARNINGPATH             ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫    ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id                     ┃    ┃ PK: id                     ┃
+┃ FK: user_id                ┃    ┃ FK: mentor_id              ┃
+┃ label                      ┃    ┃ title                      ┃
+┃ description                ┃    ┃ description                ┃
+┃ method                     ┃    ┃ skill_focus                ┃
+┃ created_at                 ┃    ┃ created_at                 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+        │                                   │
+        │ 1:N                               │ 1:N
+        │                                   │
+        ▼                                   ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ PAPERCLUSTERMEMBERSHIP     ┃    ┃   LEARNINGPATHSTEP         ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫    ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ PK: id                     ┃    ┃ PK: id                     ┃
+┃ FK: cluster_id             ┃    ┃ FK: path_id                ┃
+┃ paper_id                   ┃    ┃ step_order                 ┃
+┃ paper_title                ┃    ┃ title                      ┃
+┃ note                       ┃    ┃ description                ┃
+┃ added_at                   ┃    ┃ resource_url               ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛    ┃ estimated_minutes          ┃
+                                   ┃ created_at                 ┃
+                                   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      RELATIONSHIP CARDINALITIES                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ Relationship                          │ Type  │ Cardinality              │
+├──────────────────────────────────────────────────────────────────────────┤
+│ User → Profile                        │ 1:1   │ One user has one profile │
+│ User → SavedPaper                     │ 1:N   │ User saves many papers   │
+│ User → Collection                     │ 1:N   │ User creates collections │
+│ User → CitationLink                   │ 1:N   │ User adds citations      │
+│ User → ResearchChatSession            │ 1:N   │ User has chat sessions   │
+│ Collection → CollectionPaper          │ 1:N   │ Collection has papers    │
+│ ResearchChatSession → Message         │ 1:N   │ Session has messages     │
+│ User (Mentor) ↔ User (Student)        │ M:N   │ Many mentors-students    │
+│ ReadingGroup ↔ User                   │ M:N   │ Groups have members      │
+│ CitationLink (source ↔ target)        │ N:N   │ Graph edges (directed)   │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         KEY CONSTRAINTS                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Constraint Type           │ Example                                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│ PRIMARY KEY               │ id INTEGER PRIMARY KEY AUTOINCREMENT           │
+│ FOREIGN KEY (CASCADE)     │ FOREIGN KEY (user_id) REFERENCES user(id)      │
+│                           │   ON DELETE CASCADE                            │
+│ UNIQUE                    │ UNIQUE (user_id, paper_id)                     │
+│ CHECK                     │ CHECK (role IN ('student', 'mentor', 'admin')) │
+│ NOT NULL                  │ email VARCHAR(255) NOT NULL                    │
+│ DEFAULT                   │ is_active BOOLEAN DEFAULT TRUE                 │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            INDEXES                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Index Type                │ Purpose                    │ Example           │
+├────────────────────────────────────────────────────────────────────────────┤
+│ Foreign Key Index         │ Improve JOIN performance   │ idx_savedpaper_   │
+│                           │                            │   user_id         │
+│ Search Index              │ Fast lookups               │ idx_user_email    │
+│ Time-based Index          │ Query by date              │ idx_savedpaper_   │
+│                           │                            │   saved_at        │
+│ Composite Index           │ Multi-column lookups       │ idx_citationlink_ │
+│                           │                            │   bidirectional   │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       DATABASE STATISTICS                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+• Total Tables: 20+
+• Total Indexes: 20+
+• Foreign Keys: 15+
+• Unique Constraints: 10+
+• Check Constraints: 5+
+• Views: 3 (user_statistics, citation_network_summary, collection_overview)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      NORMALIZATION STATUS                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+✓ 1NF (First Normal Form)
+  - All attributes are atomic
+  - No repeating groups
+  - Each cell contains single value
+
+✓ 2NF (Second Normal Form)  
+  - Meets 1NF requirements
+  - No partial dependencies
+  - All non-key attributes depend on full primary key
+
+✓ 3NF (Third Normal Form)
+  - Meets 2NF requirements  
+  - No transitive dependencies
+  - No non-key → non-key dependencies
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    REFERENTIAL INTEGRITY                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Action                    │ Behavior                                       │
+├────────────────────────────────────────────────────────────────────────────┤
+│ ON DELETE CASCADE         │ Delete child records when parent is deleted    │
+│ Foreign Key Constraints   │ Prevent orphaned records                       │
+│ Unique Constraints        │ Prevent duplicate entries                      │
+│ Check Constraints         │ Enforce domain constraints                     │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                           LEGEND                                           ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║  PK     = Primary Key                                                      ║
+║  FK     = Foreign Key                                                      ║
+║  1:1    = One-to-One relationship                                          ║
+║  1:N    = One-to-Many relationship                                         ║
+║  M:N    = Many-to-Many relationship                                        ║
+║  ━━━    = Strong entity                                                    ║
+║  ───    = Weak entity / Junction table                                     ║
+║  ◄──►   = Relationship line                                                ║
+║  UNIQUE = Unique constraint                                                ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+

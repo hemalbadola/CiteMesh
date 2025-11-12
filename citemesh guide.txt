@@ -1,0 +1,4536 @@
+Research Paper Reposi
+t
+DBMS Projec
+t Men
+t
+or Gu
+ory & Ci
+tat
+ion Ne
+twork -
+ide
+Projec
+t
+Ti
+tle: Research Paper Reposi
+t
+ory & Ci
+tat
+ion Ne
+twork Database Syst
+em
+Team Members:
+Hemal - Team Lead & In
+t
+egrat
+ion Special
+ist
+t
+Maaz - Data Archi
+ec
+ture & ER Design Special
+ist
+Naincy - Schema Design & Normal
+izat
+ion Special
+ist
+y
+ush - Q
+u
+ery
+O
+pt
+imizat
+ion & Test
+ing Special
+ist
+Projec
+t Durat
+ion: 6-8 weeks
+Diffic
+ult
+y Level: 6/10 (In
+t
+ermediat
+e-Advanced DBMS Projec
+t
+)
+Database Syst
+em: MySQL/Post
+greSQL (Recommended)
+A
+1. Projec
+t Vision & O
+t
+bjec
+ives
+1.1 What Y o
+u're B
+u
+ilding
+comprehensive database syst
+em t
+hat manages academic research papers, aut
+hors, ci
+tat
+ions, and research
+trends -
+essen
+t
+ially a mini "Google Scho
+lar" or "ResearchGat
+e" backend
+t
+hat
+demonstrat
+es real-world DBMS design principles.
+A
+1.2 Core Features t
+o Implemen
+t
+Paper Managemen
+t: S
+t
+ore and re
+t
+trieve research papers wi
+h f
+ull me
+tadata
+ut
+hor Profiles: Track researcher informat
+ion and
+t
+heir pu
+bl
+icat
+ions
+Ci
+tat
+ion Ne
+twork: Model and analyze how papers reference each o
+t
+her
+Advanced Search: Find papers by mult
+t
+iple cri
+eria (aut
+hor, t
+opic, year, ci
+tat
+ion co
+naly
+t
+ics: Generat
+e insigh
+ts on research
+trends, t
+op aut
+hors, most
+t
+ci
+ed papers
+Co
+llaborat
+ion
+nalysis: Discover co-aut
+horship patt
+erns and research ne
+tworks
+A
+u
+t
+n
+)
+A
+A
+1.3 Why This Projec
+t
+S
+tands
+ut
+O
+Real-world relevance: So
+lves ac
+tual problems in academic research managemen
+t
+Complex relat
+ionships: Demonstrat
+es mast
+ery of many-t
+o-many relat
+ionships and joins
+Advanced qu
+eries: Requ
+ires rec
+ursive qu
+eries, aggregat
+ions, and analy
+t
+ical t
+k
+hin
+ing
+t
+Scalabili
+y considerat
+ions: Teaches indexing, normal
+izat
+ion, and performance opt
+imizat
+ion
+Graph-like data: Ci
+tat
+ion ne
+tworks mirror social
+ne
+tworks and recommendat
+ion syst
+ems
+2. Projec
+t Me
+t
+hodo
+l
+ogy & Approach
+2.1 Database Design Phil
+osophy
+S
+tart wi
+t
+h User S
+t
+ories, No
+t
+Tables
+Before wri
+t
+ing any SQL, clearly define what users need
+t
+o do:
+"As a researcher, I wan
+t t
+o find all papers pu
+bl
+ished by a specific aut
+hor"
+"As an academic, I wan
+t t
+t
+o see which papers ci
+e my work"
+"As a l
+ibrarian, I wan
+Think En
+t
+t
+i
+ies First, Implemen
+t t
+o iden
+t
+tat
+ion Lat
+er
+ify
+t
+he most
+influ
+en
+t
+ial papers in a field"
+Iden
+t
+ify
+t
+he "no
+u
+ns" in yo
+ur user st
+ories (Paper, A
+ut
+hor, Ci
+tat
+ion, Topic, Inst
+tut
+i
+ion)
+Define
+t
+he "verbs" as relat
+t
+ionships (Wri
+t
+es, Ci
+es, Bel
+ongsTo, Co
+llaborat
+es)
+n
+ly
+O
+t
+hen worry abo
+ut table stru
+c
+tures and foreign
+keys
+2.2 Design Process S
+t
+eps
+t
+S
+ep 1: Requ
+iremen
+ts A
+nalysis (Week 1)
+Gat
+her and doc
+umen
+t
+u
+t
+f
+nc
+ional requ
+u
+Define non-f
+t
+nc
+ional requ
+iremen
+Creat
+e
+user personas and
+use cases
+Establ
+ish projec
+t scope and bo
+u
+ndaries
+iremen
+ts
+l
+ts (performance, scalabi
+t
+i
+y)
+t
+S
+ep 2: Conceptual Design (Week 1-2)
+Creat
+e En
+t
+t
+i
+y-Relat
+ionship (ER) diagram
+Iden
+t
+ify en
+t
+t
+i
+ies, attrib
+ut
+es, and relat
+ionships
+De
+t
+ermine cardinal
+t
+i
+ies and part
+icipat
+ion constrain
+ts
+Val
+idat
+e design against requ
+iremen
+ts
+t
+S
+ep 3: Logical Design (Week 2-3)
+Convert ER diagram t
+o relat
+ional schema
+Apply normal
+izat
+ion rules (1NF, 2NF, 3NF)
+Define primary and foreign
+keys
+Establ
+ish referen
+t
+ial
+t
+t
+in
+egri
+y constrain
+ts
+t
+S
+ep 4: Physical Design (Week 3-4)
+Choose appropriat
+e data t
+ypes
+Design indexes for qu
+ery opt
+imizat
+ion
+Consider part
+t
+i
+ioning strat
+egies
+Plan st
+orage and backup requ
+iremen
+ts
+t
+S
+ep 5: Implemen
+tat
+ion (Week 4-5)
+Creat
+e database and
+tables
+Insert sample data
+Implemen
+t and
+t
+est qu
+eries
+u
+B
+i
+ld
+user in
+t
+erface (opt
+ional)
+t
+S
+ep 6: Test
+ing & O
+pt
+imizat
+ion (Week 6)
+u
+Test all f
+t
+nc
+ional
+t
+i
+y
+t
+horo
+u
+gh
+ly
+pt
+O
+imize sl
+ow qu
+eries
+Val
+idat
+e data in
+t
+t
+egri
+y
+Prepare demonstrat
+ion scenarios
+3. De
+tailed Team Assignmen
+ts
+3.1 Hemal - Team Lead & In
+t
+egrat
+ion Specialist
+t
+Primary Responsibili
+ies
+Yo
+u're
+t
+he cond
+u
+professional standards.
+t
+c
+or of
+t
+his orchestra - ensuring all componen
+ts work t
+t
+oge
+her seamlessly and
+t
+he projec
+t mee
+ts
+Specific Tasks
+Week 1: Projec
+t Fo
+u
+ndat
+ion
+Projec
+t
+Se
+tup: Creat
+e shared Gi
+tHu
+t
+b reposi
+t
+ory wi
+h clear fo
+lder stru
+c
+ture
+Requ
+iremen
+ts Doc
+umen
+tat
+ion: Lead
+t
+eam mee
+t
+ings t
+o final
+ize feature l
+ist and
+user st
+ories
+l
+Techno
+ogy S
+tack Decision: Choose database syst
+em (MySQL vs Post
+greSQL) and
+t
+oo
+ls
+Team Coordinat
+ion: Establ
+ish commu
+nicat
+ion channels and mee
+t
+ing sched
+ules
+Week 2: Design Coordinat
+ion
+ER Diagram Review: Val
+idat
+e Maaz's ER design against requ
+iremen
+ts
+Schema In
+t
+egrat
+ion: Ensure Naincy's schema al
+t
+igns wi
+h ER design
+Consist
+ency Checking: Verify naming conven
+t
+ions and design standards
+Doc
+umen
+tat
+ion S
+tandards: Establ
+ish
+t
+emplat
+es for all projec
+t
+doc
+umen
+ts
+Week 3-4: Implemen
+tat
+ion Leadership
+Database Se
+tup: Creat
+e devel
+opmen
+t and
+t
+est
+ing databases
+In
+t
+egrat
+ion Test
+ing: Ensure all t
+eam componen
+ts work t
+t
+oge
+her
+Code Reviews: Review SQL DDL, qu
+eries, and
+t
+est
+cases from t
+eam members
+t
+Progress Tracking: Moni
+or mi
+lest
+ones and adj
+ust t
+imel
+ine if needed
+Week 5: Q
+t
+uali
+y
+Assurance
+End-t
+o-End Test
+ing: Test
+comple
+t
+e
+user workfl
+ows from data en
+try
+t
+o complex qu
+Performance Validat
+ion: Verify qu
+ery performance mee
+ts acceptable standards
+Doc
+umen
+tat
+ion Review: Ensure all doc
+umen
+tat
+ion is comple
+t
+e and professional
+Demo Preparat
+ion: Creat
+e demonstrat
+ion script and backup scenarios
+eries
+Week 6: Final Delivery
+Demo Coordinat
+ion: Lead
+t
+he final demonstrat
+t
+ion
+o fac
+ult
+Presen
+tat
+ion Preparat
+ion: Creat
+e sl
+ides and
+talk
+ing poin
+Final Test
+ing: Cond
+u
+c
+t last
+-min
+ut
+t
+e
+est
+ing and b
+u
+g fixes
+Projec
+t Handover: Prepare final del
+iverables and doc
+umen
+y
+ts for t
+eam presen
+tat
+ion
+tat
+ion package
+t
+Cri
+ical S
+u
+ccess Fac
+t
+ors for Y o
+u
+Commu
+nicat
+ion: Ho
+ld weekly
+t
+eam mee
+t
+ings and dai
+ly check-ins d
+uring cru
+nch periods
+Q
+uali
+t
+y Con
+tro
+l: Every componen
+t sho
+uld pass yo
+ur review before in
+Risk Managemen
+t: Iden
+t
+ify po
+t
+t
+en
+ial roadbl
+ocks early and have con
+Doc
+umen
+tat
+ion: Main
+tain professional-level doc
+umen
+tat
+ion
+t
+hro
+u
+gho
+t
+egrat
+ion
+t
+ingency plans
+ut t
+he projec
+t
+t
+3.2 Maaz - Data Archi
+ec
+ture & ER Design Specialist
+t
+Primary Responsibili
+ies
+Yo
+u're
+efficien
+t
+he archi
+t
+t
+ec
+t, and main
+- designing
+tainable.
+t
+he conceptual fo
+u
+ndat
+ion
+t
+hat
+de
+t
+ermines whe
+t
+her t
+he en
+t
+ire syst
+em wi
+ll be l
+ogical,
+Specific Tasks
+Week 1: Requ
+iremen
+ts & En
+t
+t
+i
+y
+A
+nalysis
+User S
+t
+ory
+nalysis: Break down each requ
+iremen
+t
+in
+t
+o database en
+t
+t
+i
+ies and operat
+ions
+En
+t
+t
+i
+y Iden
+t
+ificat
+ion: Iden
+Conferences/Jo
+urnals)
+t
+ify all major en
+t
+t
+i
+ies (Papers, A
+ut
+hors, Ci
+tat
+ions, Topics, Inst
+tut
+i
+ions,
+ttrib
+ut
+e Discovery: List all
+necessary attrib
+ut
+es for each en
+t
+t
+i
+y
+Relat
+ionship Mapping: Define how en
+t
+t
+i
+ies relat
+e
+t
+o each o
+t
+her
+A
+A
+Week 2: ER Diagram Devel
+opmen
+t
+t
+Ini
+ial ER Design: Creat
+e comprehensive ER diagram using professional t
+oo
+ls (draw.io,
+Lu
+cidchart, or ERDPlus)
+Relat
+ionship Cardinali
+t
+ies: Define one-t
+o-many, many-t
+o-many relat
+t
+ionships wi
+h proper
+no
+tat
+ion
+Constrain
+t Doc
+umen
+tat
+ion: Specify part
+icipat
+ion constrain
+ts (t
+o
+tal/part
+ial) and b
+usiness rules
+Design Validat
+ion: Walk t
+hro
+u
+gh
+user scenarios t
+o ensure ER model supports all requ
+iremen
+ts
+Week 3: ER Refinemen
+t & Doc
+umen
+tat
+ion
+Normalizat
+ion Review: Ensure ER design wi
+ll lead
+t
+o properly normal
+ized
+tables
+En
+t
+t
+i
+y
+ttrib
+ut
+e A
+nalysis: Verify all attrib
+ut
+es are at
+omic and properly placed
+Relat
+ionship Validat
+ion: Confirm all many-t
+o-many relat
+ionships are properly iden
+t
+ified
+lt
+ernat
+ive Design Evaluat
+ion: Consider and doc
+umen
+t
+design alt
+ernat
+t
+ives wi
+h pros/cons
+A
+A
+Week 4: Sample Data Planning
+Data Requ
+iremen
+ts: Define sample data needs for comprehensive
+t
+est
+ing
+Test
+Scenarios: Plan data se
+ts t
+hat support all major qu
+eries and edge cases
+Data Relat
+ionships: Ensure sample data inclu
+des real
+ist
+ic ci
+tat
+ion ne
+tworks and co
+Data Q
+uali
+t
+y: Plan for data val
+idat
+ion rules and constrain
+t t
+est
+ing
+llaborat
+ions
+Week 5: In
+t
+egrat
+ion & Validat
+ion
+Schema A
+lignmen
+u
+Q
+ery S
+upport
+Design Doc
+umen
+t
+t: Work wi
+h Naincy
+t
+o ensure smoo
+A
+nalysis: Verify
+t
+hat ER design supports all
+t
+h ER-t
+o-schema conversion
+of A
+y
+ush's planned qu
+eries
+tat
+ion: Creat
+e comprehensive ER design doc
+umen
+t
+t wi
+h j
+ust
+ificat
+ions
+Change Managemen
+t: Handle any necessary design modificat
+ions d
+uring implemen
+tat
+ion
+Week 6: Final Doc
+umen
+tat
+ion & Demo S
+upport
+Visual Mat
+erials: Prepare clear ER diagrams for presen
+tat
+ion
+Design Defense: Be ready
+t
+o explain and defend every design decision
+lt
+ernat
+ive Scenarios: Prepare
+t
+o disc
+uss how design wo
+uld handle f
+uture requ
+Lessons Learned: Doc
+umen
+t
+insigh
+ts gained d
+uring
+t
+he design process
+iremen
+A
+ts
+t
+Cri
+ical S
+u
+ccess Fac
+t
+ors for Y o
+u
+Comple
+t
+eness: Yo
+Clari
+t
+y: Design sho
+ur ER model must
+capture every requ
+iremen
+t
+t wi
+ho
+ut red
+u
+ndancy
+uld be
+u
+nderstandable
+t
+o bo
+t
+h
+t
+echnical and non-t
+echnical stakeho
+Flexibili
+t
+y: Model sho
+Doc
+umen
+uld accommodat
+e reasonable f
+uture ext
+ensions
+tat
+ion: Every design decision sho
+uld have clear j
+ust
+ificat
+ion
+lders
+Too
+ls & Reso
+urces Recommended
+ER Diagramming: draw.io (free), Lu
+cidchart (stu
+den
+t l
+icense), ERDPlus
+Doc
+umen
+tat
+ion: No
+t
+t
+ion, Google Docs wi
+h version con
+tro
+l
+Research: Loo
+k at
+exist
+ing academic database schemas for inspirat
+ion
+Validat
+ion: Use Chen no
+tat
+ion or Crow's Foo
+t
+no
+tat
+ion consist
+en
+tly
+3.3 Naincy - Schema Design & Normalizat
+ion Specialist
+t
+Primary Responsibili
+ies
+Yo
+u're
+t
+he
+translat
+or - convert
+ing conceptual design in
+ind
+ustry best prac
+t
+ices.
+t
+o opt
+imized, implemen
+Specific Tasks
+table database stru
+c
+tures t
+hat
+fo
+ll
+ow
+Week 1: Schema Planning Fo
+u
+ndat
+ion
+Normalizat
+ion S
+trat
+egy: Plan approach for achieving 3NF (Third Normal Form)
+Naming Conven
+t
+ions: Establ
+ish consist
+t
+en
+naming standards for tables, co
+lumns, and
+constrain
+ts
+Data Type Research: Research opt
+imal data t
+ypes for differen
+t attrib
+ut
+e cat
+egories
+Constrain
+t
+Planning: Plan all
+t
+t
+constrain
+ts, check constrain
+in
+ts)egri
+y constrain
+ts (primary keys, foreign
+keys, u
+niqu
+e
+t
+Week 2: Ini
+ial Schema Design
+Table Creat
+ion: Convert Maaz's ER en
+t
+t
+i
+ies in
+t
+o
+table stru
+c
+tures
+u
+Join Table Design: Design j
+t
+nc
+ion
+tables for many-t
+o-many relat
+ionships (PaperA
+PaperCi
+tat
+ion, PaperTopic)
+Primary Key S
+trat
+egy: Choose be
+tween natural keys and surrogat
+e keys for each
+Foreign Key Mapping: Define all referen
+t
+ial
+t
+t
+in
+egri
+y relat
+ionships
+ut
+hor,
+table
+Week 3: Normalizat
+ion & O
+pt
+imizat
+ion
+1NF Verificat
+ion: Ensure all attrib
+ut
+es are at
+omic (no mult
+i-valu
+ed attrib
+ut
+es)
+2NF A
+nalysis: El
+iminat
+e part
+t
+ial dependencies on composi
+e keys
+3NF Implemen
+tat
+ion: Remove
+t
+transi
+ive dependencies
+Denormalizat
+ion Decisions: Iden
+t
+ify where strat
+egic denormal
+izat
+ion migh
+t
+performance
+improve
+Week 4: DDL Devel
+opmen
+t & Constrain
+ts
+CREATE TA
+BLE S
+tat
+emen
+t
+ts: Wri
+e comprehensive DDL for all tables
+Constrain
+t Implemen
+tat
+ion: Add all check constrain
+ts, u
+niqu
+e constrain
+Index Planning: Design indexes for primary access patt
+t
+erns (work wi
+h
+Data Validat
+ion Rules: Implemen
+t
+domain constrain
+ts and b
+usiness l
+ogic
+ts, and b
+usiness rules
+y
+ush)
+Week 5: Schema Test
+ing & Refinemen
+t
+Schema Validat
+t
+ion: Test schema wi
+h sample data insert
+ion
+Constrain
+t
+Test
+ing: Verify all
+t
+t
+in
+egri
+y constrain
+ts work correc
+tly
+Performance Considerat
+ions: A
+nalyze and opt
+imize schema for expec
+t
+ed qu
+Doc
+umen
+tat
+ion: Creat
+e comprehensive schema doc
+umen
+tat
+t
+ion wi
+h data dic
+t
+ionary
+ery patt
+erns
+Week 6: Final Schema & Demo Preparat
+ion
+Prod
+u
+t
+c
+ion Schema: Final
+ize schema for demonstrat
+ion database
+Schema Doc
+umen
+tat
+ion: Comple
+t
+e data dic
+t
+ionary and
+table relat
+ionships doc
+umen
+Migrat
+ion Scripts: Prepare scripts for easy database se
+tup and
+t
+eardown
+Schema Defense: Prepare explanat
+ions for all
+normal
+izat
+ion and design decisions
+t
+t
+Cri
+ical S
+u
+ccess Fac
+t
+ors for Y o
+u
+Normalizat
+ion Mast
+ery: Schema must
+In
+t
+egri
+t
+y: A
+ll referen
+t
+ial
+t
+t
+in
+egri
+y constrain
+Performance Awareness: Schema design sho
+be properly normal
+t
+ized wi
+h clear explanat
+ions
+ts must
+be correc
+tly implemen
+t
+ed
+uld support
+efficien
+t qu
+erying
+A
+Doc
+umen
+tat
+ion: Every
+table and co
+lumn sho
+uld have clear purpose and constrain
+ts
+Key Deliverables
+1. Comple
+t
+e DDL Scripts: A
+ll CREATE TA
+BLE, ALTER TA
+BLE, and constrain
+t stat
+emen
+ts
+2. Data Dic
+t
+ionary: Comple
+t
+e doc
+umen
+tat
+ion of all tables, co
+lumns, and relat
+ionships
+3. Normalizat
+ion Doc
+umen
+tat
+ion: S
+t
+ep-by-st
+ep explanat
+ion of normal
+izat
+ion process
+4. Schema Diagram: Visual represen
+tat
+ion of final table relat
+ionships
+t
+Common Pi
+falls t
+o
+Avoid
+O
+ver-normalizat
+ion: Don't
+creat
+e
+tables t
+hat sho
+uld be attrib
+ut
+es
+Under-normalizat
+ion: Don't leave red
+u
+ndan
+t
+data t
+hat sho
+uld be normal
+ized
+Inconsist
+en
+t Naming: Use consist
+t
+en
+naming conven
+t
+ions t
+hro
+u
+ut
+gho
+Missing Constrain
+ts: Don't
+forge
+t
+check constrain
+ts for b
+usiness rules
+3.4 A
+y
+ush - Q
+u
+ery
+pt
+O
+imizat
+ion & Test
+ing Specialist
+t
+Primary Responsibili
+ies
+Yo
+u're
+t
+he performance engineer - ensuring
+t
+he database no
+l
+oads and complex analy
+t
+ical qu
+eries.
+Specific Tasks
+t
+on
+ly works correc
+tly b
+ut performs efficien
+tly
+u
+nder real
+ist
+ic
+Week 1: Q
+u
+ery Requ
+iremen
+ts A
+nalysis
+Use Case
+t
+o Q
+u
+ery Mapping: Convert
+each
+user st
+ory in
+t
+o specific SQL qu
+ery requ
+iremen
+ts
+Performance Requ
+iremen
+ts: Define acceptable response
+t
+imes for differen
+t qu
+ery
+t
+ypes
+Complexi
+t
+y
+nalysis: Iden
+t
+ify qu
+eries t
+hat wi
+ll requ
+ire opt
+imizat
+ion (rec
+ursive, complex joins,
+aggregat
+ions)
+Test Case Planning: Plan comprehensive
+t
+est scenarios for all qu
+ery
+t
+ypes
+A
+Week 2: Q
+u
+ery Design & Devel
+opmen
+t
+Basic CRUD
+O
+perat
+ions: Design Insert, Updat
+e, Dele
+t
+e, and simple Selec
+t
+operat
+ions
+Search Q
+u
+eries: Devel
+op mult
+t
+i-cri
+eria search qu
+eries (by aut
+hor, t
+opic, year, e
+t
+c.)
+naly
+t
+ical Q
+u
+eries: Design complex qu
+eries for trends, ran
+k
+ings, and stat
+ist
+ics
+Relat
+ionship Q
+u
+eries: Devel
+op qu
+eries t
+hat traverse
+t
+he ci
+tat
+ion ne
+twork
+A
+Week 3: Advanced Q
+u
+ery Implemen
+tat
+ion
+Ci
+tat
+ion
+nalysis: Implemen
+t rec
+ursive qu
+eries for ci
+tat
+ion chains and influ
+ence
+track
+ing
+Co-aut
+horship Q
+u
+eries: Devel
+op qu
+eries t
+o find co
+llaborat
+ion patt
+erns
+Trend A
+nalysis: Creat
+t
+e
+ime-based analy
+t
+ical qu
+eries for research
+trends
+Ranking A
+lgori
+t
+hms: Implemen
+t qu
+eries for "most
+t
+ci
+ed," "most pro
+l
+ific aut
+hors," e
+t
+c.
+A
+Week 4: Performance O
+pt
+imizat
+ion
+t
+Index Design: Work wi
+h Naincy
+t
+o design opt
+imal
+indexes for yo
+u
+Q
+ery
+pt
+O
+imizat
+ion: A
+nalyze and opt
+imize sl
+ow-performing qu
+eries
+Exec
+ut
+ion Plan
+nalysis: Use EXPLAIN t
+u
+o
+nderstand and improve qu
+lt
+ernat
+ive Approaches: Devel
+op mult
+iple approaches for complex qu
+t
+hem
+ur qu
+eries
+A
+A
+ery performance
+eries and benchmark
+Week 5: Comprehensive Test
+ing
+Uni
+t
+Test
+ing: Test
+each qu
+ery individ
+t
+ually wi
+h vario
+us inputs
+In
+t
+egrat
+ion Test
+ing: Test qu
+eries against real
+ist
+ic data vo
+lumes
+Performance Test
+ing: Measure qu
+ery performance and iden
+t
+ify bo
+ttlenecks
+Edge Case Test
+ing: Test qu
+t
+eries wi
+u
+h
+n
+usual
+or bo
+u
+t
+ndary data condi
+ions
+Week 6: Demo Q
+u
+eries & Final Test
+ing
+Demo Q
+u
+ery Se
+t: Prepare impressive qu
+eries for l
+ive demonstrat
+ion
+u
+Q
+Tro
+ery Doc
+umen
+tat
+ion: Doc
+umen
+t all qu
+t
+eries wi
+h explanat
+ions and
+use cases
+Performance Benchmarks: Provide performance stat
+ist
+ics for all major qu
+eries
+u
+bleshoo
+t
+ing Gu
+ide: Prepare so
+lut
+ions for common qu
+ery issu
+es
+t
+Cri
+ical S
+u
+ccess Fac
+t
+ors for Y o
+u
+u
+Q
+ery Correc
+t
+ness: A
+ll qu
+eries must re
+turn acc
+urat
+e results u
+t
+nder all condi
+ions
+Performance: Q
+u
+eries sho
+t
+uld perform acceptably even wi
+h real
+ist
+ic data vo
+lumes
+Comple
+t
+eness: Must
+u
+cover all f
+t
+nc
+ional requ
+iremen
+t
+ts wi
+h appropriat
+e qu
+eries
+Doc
+umen
+tat
+ion: Every qu
+ery sho
+uld be well-doc
+umen
+t
+t
+ed wi
+h clear purpose
+Advanced Q
+u
+ery Cat
+egories t
+o Mast
+er
+1. Ci
+tat
+ion Ne
+twork
+A
+nalysis
+Direc
+t Ci
+tat
+ions: "Find all papers t
+hat
+t
+ci
+e paper X"
+Ci
+tat
+ion Chains: "Find papers t
+hat
+t
+ci
+e papers t
+hat
+t
+ci
+e paper X" (rec
+ursive)
+Ci
+tat
+ion Co
+u
+n
+t: "Ran
+k papers by
+t
+o
+tal ci
+tat
+ion co
+u
+n
+t"
+Mutual Ci
+tat
+ions: "Find papers t
+hat
+t
+ci
+e each o
+t
+her"
+2. A
+ut
+hor A
+nalysis
+Prod
+u
+t
+c
+ivi
+t
+y: "Find most pro
+l
+ific aut
+hors by pu
+bl
+icat
+ion co
+u
+Co
+llaborat
+ion: "Find aut
+hors who co
+llaborat
+e most
+frequ
+en
+Impac
+t: "Find aut
+t
+hors wi
+h highest t
+o
+tal ci
+tat
+ion co
+u
+n
+t"
+Ne
+twork: "Find aut
+hors connec
+t
+ed
+t
+hro
+u
+gh co
+llaborat
+ions"
+n
+t"
+tly"
+3. Trend A
+nalysis
+Temporal Trends: "Show pu
+Emerging Fields: "Iden
+t
+ify
+Inst
+tut
+i
+ion Rankings: "Ran
+Conference A
+nalysis: "A
+bl
+icat
+ion
+trends over t
+ime by
+t
+opic"
+t
+t
+opics wi
+h increasing pu
+bl
+icat
+ion rat
+es"
+k
+inst
+tut
+i
+ions by research o
+utput"
+nalyze conference pu
+bl
+icat
+ion patt
+erns"
+4. Complex A
+naly
+t
+ical Q
+u
+eries
+Page Rank S
+t
+yle: "Calc
+ulat
+e aut
+hor influ
+ence based on ci
+tat
+ion ne
+twork"
+Clust
+ering: "Gro
+up simi
+lar papers based on ci
+tat
+ions and
+t
+opics"
+Recommendat
+ion: "S
+u
+ggest papers based on
+user's reading hist
+ory"
+nomaly De
+t
+t
+ec
+ion: "Find
+u
+n
+usual patt
+erns in pu
+bl
+icat
+ion or ci
+tat
+ion data"
+A
+4. Projec
+t
+Timeline & Milest
+ones
+Week 1: Fo
+u
+ndat
+ion Phase
+Milest
+one 1: Requ
+iremen
+ts & Ini
+t
+ial Design Comple
+t
+e
+Team Goals:
+Comple
+t
+e requ
+iremen
+ts doc
+umen
+tat
+ion
+Final
+ize ER diagram (Maaz)
+Establ
+ish schema design principles (Naincy)
+Define qu
+ery requ
+iremen
+ts (A
+y
+ush)
+Se
+t up projec
+t
+Deliverables:
+infrastru
+c
+ture (Hemal)
+u
+S
+Requ
+iremen
+ts doc
+umen
+t
+t wi
+h
+t
+Ini
+ial ER diagram
+l
+Techno
+ogy stack decisions
+Projec
+t t
+imel
+ine and commu
+ccess Cri
+t
+eria:
+user st
+ories
+nicat
+ion plan
+ll t
+eam members agree on projec
+t scope
+ER diagram covers all requ
+iremen
+ts
+Clear task assignmen
+ts for next phase
+A
+Week 2: Design Phase
+Milest
+one 2: Comple
+t
+e Database Design
+Team Goals:
+Final
+t
+ize ER diagram wi
+h all relat
+ionships (Maaz)
+Comple
+t
+e l
+ogical schema design (Naincy)
+t
+Design ini
+ial qu
+ery se
+t (A
+y
+ush)
+Coordinat
+e design in
+Deliverables:
+t
+egrat
+ion (Hemal)
+t
+Final ER diagram wi
+h doc
+umen
+tat
+ion
+Comple
+t
+e
+t
+table schema wi
+h all constrain
+ts
+t
+Ini
+ial qu
+ery specificat
+ions
+u
+S
+Design review doc
+umen
+ccess Cri
+t
+eria:
+tat
+ion
+ER diagram val
+idat
+ed against all requ
+iremen
+ts
+Schema properly normal
+ized
+t
+o 3NF
+u
+Q
+ery requ
+iremen
+ts clearly defined
+Design passes t
+eam review
+Week 3: Implemen
+tat
+ion Phase Part 1
+Milest
+one 3: Database Creat
+ion & Basic Fu
+t
+t
+nc
+ionali
+y
+Team Goals:
+Implemen
+t physical database schema (Naincy)
+Creat
+e sample data se
+ts (Maaz)
+Implemen
+t
+basic CRUD operat
+ions (A
+y
+ush)
+Se
+t up devel
+opmen
+t
+environmen
+t (Hemal)
+Deliverables:
+u
+S
+Work
+t
+ing database wi
+h all tables and constrain
+Comprehensive sample data
+Basic insert, updat
+e, dele
+t
+e operat
+ions
+Devel
+opmen
+t
+environmen
+t
+doc
+umen
+tat
+ion
+ccess Cri
+t
+eria:
+Database schema su
+ccessf
+ully creat
+ed
+Sample data demonstrat
+es all relat
+ionships
+Basic operat
+ions work correc
+tly
+ll t
+eam members can access devel
+opmen
+ts
+A
+t
+environmen
+t
+Week 4: Implemen
+tat
+ion Phase Part 2
+Milest
+one 4: Advanced Features Implemen
+tat
+ion
+Team Goals:
+Refine and opt
+imize schema (Naincy)
+Expand sample data coverage (Maaz)
+Implemen
+t
+complex qu
+eries (A
+y
+ush)
+In
+t
+egrat
+e all componen
+ts (Hemal)
+Deliverables:
+u
+S
+pt
+t
+O
+imized database schema wi
+h indexes
+Ext
+t
+ended sample data wi
+h real
+ist
+ic scenarios
+Comple
+t
+e qu
+ery l
+ibrary
+In
+t
+egrat
+ed syst
+em doc
+umen
+tat
+ion
+ccess Cri
+t
+eria:
+ll complex qu
+eries implemen
+t
+ed and
+t
+est
+ed
+Database performance mee
+ts requ
+iremen
+ts
+In
+t
+egrat
+ion issu
+es reso
+lved
+Syst
+em ready for comprehensive
+t
+est
+ing
+A
+Week 5: Test
+ing & O
+pt
+imizat
+ion Phase
+Milest
+one 5: Syst
+em Validat
+ion & Performance T
+u
+ning
+Team Goals:
+Comple
+t
+e syst
+em t
+est
+ing (A
+ll)
+pt
+O
+imize qu
+ery performance (A
+y
+ush)
+Val
+idat
+e design decisions (Naincy & Maaz)
+Prepare doc
+umen
+Deliverables:
+tat
+ion (Hemal)
+u
+S
+Comple
+t
+e
+t
+est su
+t
+t
+i
+e wi
+h results
+Performance opt
+imizat
+ion report
+Final syst
+em doc
+umen
+tat
+ion
+Demo preparat
+ion mat
+erials
+ccess Cri
+t
+eria:
+u
+ll f
+t
+nc
+ional
+t
+i
+y
+t
+est
+ed and work
+ing
+Performance requ
+iremen
+ts me
+t
+Doc
+umen
+tat
+ion comple
+t
+e and professional
+Demo scenarios prepared and
+t
+est
+ed
+A
+Week 6: Final Delivery & Demonstrat
+ion
+Milest
+one 6: Projec
+t Comple
+t
+ion & Demonstrat
+ion
+Team Goals:
+Final syst
+em t
+est
+ing and b
+u
+g fixes (A
+ll)
+Demo preparat
+ion and prac
+t
+ice (A
+ll)
+Final doc
+umen
+tat
+ion review (Hemal)
+Presen
+Deliverables:
+tat
+ion del
+ivery
+Final work
+ing syst
+em
+Comple
+t
+e projec
+t
+doc
+umen
+tat
+ion
+Demo presen
+tat
+ion
+u
+S
+Projec
+t reflec
+t
+ion and lessons learned
+ccess Cri
+t
+eria:
+u
+S
+ccessf
+ul demonstrat
+ion
+t
+o fac
+ult
+y
+ll requ
+iremen
+ts implemen
+t
+ed and
+t
+est
+ed
+Professional qual
+t
+i
+y doc
+umen
+tat
+ion
+Team sat
+isfac
+t
+t
+ion wi
+h final prod
+u
+t
+c
+A
+5. Technical Implemen
+tat
+ion Gu
+ide
+5.1 Database Design Best
+Prac
+t
+ices
+En
+t
+t
+i
+y-Relat
+ionship Design Principles
+En
+t
+t
+i
+ies sho
+uld represen
+t
+dist
+t
+inc
+concepts: Don't
+creat
+e en
+t
+t
+i
+ies for what sho
+attrib
+ut
+es
+Relat
+ionships sho
+uld be meaningf
+ul: Every relat
+ionship sho
+uld represen
+Avoid red
+u
+ndancy: Each fac
+t sho
+uld be st
+ored in exac
+tly one place
+Plan for growt
+h: Design sho
+uld accommodat
+e reasonable f
+uture requ
+iremen
+ts
+uld be
+t a real b
+usiness rule
+Schema Design Gu
+idelines
+Use surrogat
+e keys: A
+ut
+o-incremen
+t
+ing in
+t
+l
+egers for primary keys provide stabi
+t
+i
+y
+Main
+tain natural keys: Keep meaningf
+ul u
+niqu
+e iden
+t
+ifiers (D
+O
+I, ISBN) as u
+niqu
+e indexes
+Consist
+t
+en
+naming: Use clear, consist
+t
+en
+naming conven
+t
+ions for all database objec
+ts
+Appropriat
+e data t
+ypes: Choose data t
+ypes t
+hat
+efficien
+tly represen
+t
+yo
+ur data
+5.2 Sample Database Schema O
+verview
+Core Tables S
+tru
+c
+ture
+Papers Table:
+- paper
+_
+id (Primary Key)
+- title, abstract, publication
+_year
+- doi, isbn (unique identifiers)
+- journal
+_
+name, conference
+name
+_
+- publication
+_
+date, page
+count
+_
+- pdf
+file
+_
+_path (optional)
+Authors Table:
+- author
+_
+id (Primary Key)
+- first
+_
+name, last
+_
+name, email
+- affiliation, institution
+id
+_
+- h
+_
+index, total
+citations
+_
+- created
+date, last
+_
+_
+updated
+Citations Table (Junction):
+- citing_paper
+_
+id (Foreign Key)
+- cited
+_paper
+_
+id (Foreign Key)
+- citation
+_
+context (optional)
+- citation
+_
+type (direct, indirect)
+- Primary Key: (citing_paper
+_
+id, cited
+_paper
+_
+id)
+Paper
+_
+Authors Table (Junction):
+- paper
+_
+id (Foreign Key)
+- author
+_
+id (Foreign Key)
+- author
+_
+order (1st author, 2nd, etc.)
+- contribution
+_
+type
+- Primary Key: (paper
+_
+id, author
+_
+id)
+Topics/Keywords Table:
+- topic
+_
+id (Primary Key)
+- topic
+_
+name, topic
+_
+description
+- parent
+_
+topic
+_
+id (for hierarchical topics)
+Paper
+_
+Topics Table (Junction):
+- paper
+_
+id (Foreign Key)
+- topic
+_
+id (Foreign Key)
+- relevance
+_
+score (optional)
+- Primary Key: (paper
+_
+id, topic
+_
+id)
+5.3 Advanced Features Implemen
+tat
+ion
+Ci
+tat
+ion Ne
+twork
+nalysis
+Direc
+t Ci
+tat
+ions: Simple join be
+tween Papers and Ci
+tat
+ions tables
+Ci
+tat
+ion Chains: Rec
+t
+ursive Common Table Expressions (CTEs) or i
+erat
+ive qu
+Ci
+tat
+ion Impac
+t: Aggregat
+e qu
+t
+eries wi
+h proper indexing
+Co-ci
+tat
+ion
+nalysis: Complex joins t
+t
+o find papers ci
+t
+t
+ed
+oge
+her
+A
+eries
+A
+Search and Discovery
+Mult
+i-cri
+t
+eria Search: Parame
+t
+erized qu
+t
+eries wi
+h opt
+ional WHERE clauses
+Full-t
+ext
+Search: Database-specific
+t
+l
+ext search capabi
+t
+i
+ies
+Recommendat
+ion Engine: Co
+llaborat
+ive fi
+lt
+ering based on ci
+tat
+ion patt
+erns
+Trend A
+nalysis: Time-series qu
+t
+eries wi
+h proper dat
+e handl
+ing
+6. Q
+t
+uali
+y
+Assurance & Test
+ing S
+trat
+egy
+6.1 Test
+ing Me
+t
+hodo
+l
+ogy
+t
+Uni
+Test
+ing (Individ
+ual Q
+u
+ery Test
+ing)
+Test
+each qu
+ery in iso
+lat
+t
+ion wi
+h
+k
+nown input
+data
+Verify correc
+t
+t results for normal cases, edge cases, and error condi
+ions
+t
+Check performance wi
+h real
+ist
+ic data vo
+lumes
+Doc
+umen
+t t
+est
+t
+cases wi
+h expec
+t
+ed inputs and o
+utputs
+In
+t
+egrat
+ion Test
+ing (Syst
+em-wide Test
+ing)
+Test
+comple
+t
+e workfl
+ows from data en
+try
+t
+o complex analysis
+Verify referen
+t
+ial in
+t
+egri
+t
+y across all table relat
+ionships
+Test
+conc
+urren
+t access scenarios if appl
+icable
+Validat
+e b
+usiness rules implemen
+tat
+ion
+Performance Test
+ing
+Measure qu
+t
+ify bo
+ery response
+t
+t
+imes wi
+h differen
+t
+data vo
+lumes
+Iden
+Test
+l
+ttlenecks using database profi
+t
+ing
+oo
+ls
+index effec
+t
+t
+iveness by comparing performance wi
+t
+h and wi
+ho
+Validat
+e scalabili
+t
+y projec
+t
+ions
+6.2 Data Q
+t
+uali
+y
+Assurance
+ut
+indexes
+Sample Data Validat
+ion
+Realist
+ic data relat
+ionships: Ci
+tat
+ions sho
+uld form meaningf
+ul
+Data vo
+lume appropriat
+eness: Eno
+u
+gh data t
+t
+o
+est
+complex qu
+Edge case coverage: Inclu
+u
+de
+n
+usual b
+ut val
+id data scenarios
+Constrain
+t t
+est
+ing: Data sho
+uld
+t
+est all
+t
+t
+in
+egri
+y constrain
+ts
+ne
+tworks
+eries meaningf
+ully
+Data In
+t
+t
+egri
+y Checks
+Foreign key constrain
+ts: A
+ll references sho
+uld be val
+id
+B
+usiness rule validat
+ion: A
+ll domain-specific rules sho
+Data consist
+ency: Relat
+ed data sho
+uld be l
+ogically consist
+en
+u
+di
+t trail main
+t
+enance: Track data changes if requ
+ired
+uld be enforced
+t
+A
+7. Demonstrat
+ion S
+trat
+egy
+7.1 Demo Scenario Planning
+t
+S
+ory-Based Demonstrat
+ion
+Creat
+e a narrat
+ive
+t
+hat shows t
+he syst
+l
+em's capabi
+t
+i
+ies:
+1. Se
+tup: "We're b
+u
+t
+i
+lding a research reposi
+ory for o
+ur u
+t
+niversi
+y"
+2. Data En
+try: "Le
+t's add some papers from differen
+t research areas"
+3. Basic Q
+u
+eries: "Now le
+t's find papers by specific aut
+hors"
+4. Advanced A
+nalysis: "Le
+t's analyze ci
+tat
+ion ne
+tworks and research
+trends"
+5. Insigh
+ts: "Here's what
+o
+ur data t
+ells us abo
+ut research patt
+erns"
+u
+Q
+t
+ery Complexi
+y Progression
+Simple: Basic CRUD operat
+ions and single-table qu
+eries
+In
+t
+ermediat
+e: Mult
+i-table joins and aggregat
+ion qu
+eries
+Advanced: Rec
+ursive qu
+eries, analy
+t
+u
+ical f
+t
+nc
+ions, and complex reports
+Expert: Ne
+twork analysis, trend iden
+t
+ificat
+ion, and recommendat
+ion qu
+eries
+7.2 Presen
+tat
+ion Mat
+erials
+Visual Mat
+erials Needed
+ER Diagram: Clean, professional diagram showing en
+t
+t
+i
+y relat
+ionships
+Schema Diagram: Database
+table stru
+Sample Data O
+verview: Represen
+u
+Q
+ery Results: Screensho
+ts or prin
+Performance Me
+trics: Q
+u
+ery exec
+ut
+ion
+t
+c
+ture wi
+h relat
+ionships
+tat
+ive data showing syst
+l
+em capabi
+t
+i
+ies
+t
+o
+uts of in
+t
+erest
+ing qu
+utputs
+ery o
+t
+imes and opt
+imizat
+ion results
+Technical Doc
+umen
+tat
+ion
+Design Just
+ificat
+ion: Why yo
+u made specific design decisions
+Normalizat
+ion Explanat
+ion: S
+t
+ep-by-st
+ep normal
+izat
+ion process
+u
+Q
+ery Explanat
+ion: Complex qu
+eries bro
+ken down and explained
+lt
+ernat
+ive Approaches:
+t
+O
+her design opt
+ions considered and rejec
+t
+ed
+A
+8. Common Challenges & So
+lut
+ions
+8.1 Technical Challenges
+Challenge: Rec
+ursive Ci
+tat
+ion Q
+u
+eries
+Problem: Finding ci
+tat
+ion chains (papers t
+hat
+t
+ci
+e papers t
+hat
+lut
+So
+ion: Use rec
+ursive CTEs or wri
+t
+e i
+t
+erat
+ive appl
+icat
+l
+ion
+ogic
+lt
+ernat
+ive: Pre-comput
+e ci
+tat
+ion dept
+hs d
+uring data insert
+ion
+t
+ci
+e paper X)
+A
+t
+Challenge: Performance wi
+h Large Datase
+ts
+Problem: Q
+u
+eries become sl
+ow as data vo
+lume increases
+lut
+So
+Preven
+ion: S
+trat
+egic indexing, qu
+ery opt
+imizat
+ion, and possible denormal
+izat
+ion
+t
+ion: Design wi
+t
+h performance in mind from t
+he beginning
+Challenge: Complex Many-t
+o-Many Relat
+ionships
+Problem: Papers have mult
+iple aut
+hors, t
+opics, and ci
+tat
+ions
+lut
+u
+t
+t
+ut
+So
+Best
+ion: Proper j
+nc
+ion
+table design wi
+h meaningf
+ul attrib
+es
+Prac
+t
+ice: A
+lways inclu
+de addi
+t
+ional con
+t
+ext
+u
+in j
+t
+nc
+ion
+tables
+8.2 Team Coordinat
+ion Challenges
+Challenge: Design Inconsist
+encies
+Problem: Team members work
+ing on differen
+t assumpt
+ions
+lut
+So
+ion: Reg
+ular design reviews and shared doc
+umen
+tat
+ion
+Preven
+t
+ion: Clear specificat
+ions and frequ
+t
+en
+commu
+nicat
+ion
+Challenge: In
+t
+egrat
+ion Issu
+es
+Problem: Componen
+ts don't work t
+t
+oge
+her smoo
+t
+h
+ly
+lut
+So
+Preven
+ion: Early in
+t
+egrat
+ion
+t
+est
+ing and in
+t
+erface specificat
+ions
+t
+ion: Define clear APIs and data formats upfron
+t
+Challenge: Timeline Pressure
+Problem: Features tak
+ing l
+onger t
+han expec
+t
+ed
+lut
+t
+u
+t
+t
+So
+Preven
+ion: Priori
+ize core f
+nc
+ional
+i
+y and defer advanced features
+t
+ion: Conservat
+ive
+t
+ime est
+imat
+es and reg
+ular progress track
+ing
+9. Evaluat
+t
+ion Cri
+eria & S
+u
+ccess Me
+trics
+9.1 Technical Excellence (40%)
+Database Design Q
+t
+uali
+y
+ER Model Comple
+t
+eness: Does t
+he model capture all requ
+iremen
+ts?
+Normalizat
+ion Correc
+t
+ness: Is t
+he schema properly normal
+ized?
+Constrain
+t Implemen
+tat
+ion: Are all b
+usiness rules properly enforced?
+Performance O
+pt
+imizat
+ion: Are qu
+eries opt
+imized for reasonable performance?
+Implemen
+tat
+ion Q
+t
+uali
+y
+Code Q
+uali
+t
+y: Clean, well-doc
+umen
+t
+ed SQL code
+Error Handling: Rob
+ust
+handl
+ing of edge cases and errors
+Sec
+uri
+t
+y Considerat
+ions: Appropriat
+e access con
+tro
+ls and data pro
+t
+Scalabili
+y Design: Can
+t
+he syst
+em handle growt
+h in data and
+users?
+t
+t
+ec
+ion
+9.2 Fu
+t
+t
+nc
+ionali
+y Comple
+t
+eness (30%)
+Core Features
+Data Managemen
+t: Comple
+t
+e CRUD operat
+ions for all en
+t
+t
+i
+ies
+Search Capabili
+t
+ies: Flexible search across mult
+t
+iple cri
+eria
+Relat
+ionship Q
+u
+eries: Effec
+t
+ive navigat
+ion of complex relat
+ionships
+naly
+t
+ical Q
+u
+eries: Meaningf
+ul
+insigh
+ts from data analysis
+Advanced Features
+Ci
+tat
+ion
+nalysis: Sophist
+icat
+ed analysis of ci
+tat
+ion ne
+tworks
+Trend Iden
+t
+ificat
+ion: Time-based analysis and report
+ing
+Recommendat
+ion Logic: In
+t
+ell
+igen
+t su
+ggest
+ions based on data patt
+erns
+Data Visualizat
+ion: Clear presen
+tat
+ion of qu
+ery results
+9.3 Doc
+umen
+tat
+ion & Presen
+tat
+ion (2
+0%)
+A
+A
+Technical Doc
+umen
+tat
+ion
+Design Doc
+umen
+User Doc
+umen
+Code Doc
+umen
+Test Doc
+umen
+tat
+ion: Clear explanat
+ion of design decisions
+tat
+ion: Easy-t
+ll
+o-fo
+ow usage instru
+t
+c
+ions
+tat
+ion: Well-commen
+t
+ed SQL code
+tat
+ion: Comprehensive
+t
+est
+cases and results
+Presen
+tat
+ion Q
+t
+uali
+y
+Demo Effec
+t
+iveness: Engaging demonstrat
+ion of syst
+l
+em capabi
+t
+i
+ies
+Technical Explanat
+ion: Clear explanat
+ion of complex t
+echnical concepts
+u
+Q
+est
+ion Handling: Confiden
+t responses t
+o fac
+ult
+y qu
+est
+ions
+Team Coordinat
+ion: Smoo
+t
+h co
+llaborat
+ion d
+uring presen
+tat
+ion
+9.4 Innovat
+ion & Creat
+t
+ivi
+y (10%)
+Creat
+ive So
+lut
+ions
+Novel
+Approaches: Creat
+ive so
+lut
+ions t
+o common problems
+Advanced Features: Going beyond basic requ
+iremen
+ts
+User Experience: Tho
+u
+t
+gh
+f
+ul considerat
+ion of
+user needs
+Technical Innovat
+ion: Clever use of database features
+10. Professional Devel
+opmen
+t
+O
+ut
+comes
+10.1 Technical Skills Devel
+oped
+Database Design Mast
+ery
+Conceptual Modeling: En
+t
+t
+i
+y-relat
+ionship diagram creat
+ion and val
+idat
+ion
+Logical Design: Schema design and normal
+izat
+t
+ion
+echniqu
+es
+Physical Design: Index design and performance opt
+imizat
+ion
+Implemen
+tat
+t
+ion: DDL/DML wri
+ing and database administrat
+ion
+u
+Q
+ery Devel
+opmen
+t Expert
+ise
+Basic SQL: CRUD operat
+ions and simple qu
+eries
+Advanced SQL: Complex joins, su
+bqu
+eries, and analy
+t
+u
+ical f
+t
+nc
+ions
+pt
+O
+imizat
+ion: Q
+u
+ery performance
+tu
+ning and exec
+ut
+ion plan analysis
+Specialized Q
+u
+eries: Rec
+ursive qu
+eries and graph
+traversal
+Syst
+em In
+t
+egrat
+ion Skills
+t In
+t
+Componen
+Test
+ing Me
+t
+hodo
+Doc
+umen
+egrat
+ion: Combining differen
+t syst
+em componen
+ts
+l
+ogies: Uni
+t, in
+t
+egrat
+ion, and performance
+t
+est
+ing
+tat
+t
+ion: Technical wri
+ing and syst
+em doc
+umen
+tat
+ion
+Projec
+t Managemen
+t: Timel
+ine managemen
+t and mi
+lest
+one
+track
+ing
+t
+10.2 Sof
+Skills Enhancemen
+t
+Team Co
+llaborat
+ion
+Commu
+nicat
+ion: Reg
+ular t
+eam mee
+t
+ings and progress updat
+es
+Coordinat
+ion: Managing in
+t
+erdependen
+t tasks and del
+iverables
+Conflic
+t Reso
+lut
+ion: Handl
+ing disagreemen
+ts and
+t
+echnical debat
+es
+Leadership: Tak
+t
+ing ini
+iat
+ive and g
+u
+t
+iding
+eam decisions
+Professional Presen
+tat
+ion
+Technical Commu
+nicat
+ion: Explaining complex concepts clearly
+Demo Skills: Engaging presen
+tat
+ion of
+t
+echnical work
+Doc
+umen
+tat
+ion Wri
+t
+ing: Professional t
+echnical doc
+umen
+tat
+ion
+Cri
+t
+ical Thinking: Defending design decisions and handl
+ing qu
+est
+ions
+11. S
+u
+ccess Checklist
+11.1 Before Y o
+u
+Begin (Week 1)
+[ ] A
+ll t
+eam members u
+nderstand
+t
+heir ro
+l
+les and responsibi
+t
+i
+ies
+[ ] Requ
+[ ] Commu
+iremen
+ts are clearly defined and doc
+umen
+t
+ed
+nicat
+ion channels and mee
+t
+ing sched
+ules establ
+ished
+[ ] Techno
+l
+ogy stack decisions made and
+t
+oo
+ls installed
+[ ] Projec
+t
+t reposi
+ory and doc
+umen
+tat
+ion stru
+c
+ture creat
+ed
+11.2 Design Phase Comple
+t
+ion (Week 2)
+u
+[ ] ER diagram covers all f
+t
+nc
+ional requ
+iremen
+ts
+[ ] Schema is properly normal
+ized
+t
+o at least 3NF
+[ ] A
+ll relat
+ionships and constrain
+ts are clearly defined
+[ ] Q
+u
+ery requ
+iremen
+ts are doc
+umen
+t
+ed and feasible
+[ ] Design has been reviewed and approved by en
+t
+ire
+t
+eam
+11.3 Implemen
+tat
+ion Readiness (Week 3)
+[ ] Database schema su
+ccessf
+ully creat
+ed and
+t
+est
+ed
+[ ] Sample data covers all major use cases and relat
+ionships
+[ ] Basic CRUD operat
+ions implemen
+t
+ed and work
+ing
+[ ] Devel
+opmen
+t
+environmen
+t accessible
+t
+o all t
+eam members
+[ ] Version con
+tro
+l and backup proced
+ures establ
+ished
+11.4 Syst
+em Comple
+t
+ion (Week 5)
+[ ] A
+ll planned qu
+eries implemen
+t
+ed and
+t
+est
+ed
+[ ] Performance requ
+iremen
+ts me
+t
+for all
+operat
+ions
+[ ] Data in
+t
+t
+egri
+y constrain
+ts work
+ing correc
+tly
+[ ] Doc
+umen
+tat
+ion comple
+t
+e and professional qual
+t
+i
+y
+[ ] Demo scenarios prepared and rehearsed
+11.5 Final Delivery (Week 6)
+[ ] Syst
+em demonstrat
+es all requ
+u
+ired f
+t
+nc
+ional
+t
+i
+y
+[ ] Performance benchmarks doc
+umen
+t
+ed and acceptable
+[ ] A
+ll t
+eam members can explain
+t
+heir con
+trib
+ut
+ions
+[ ] Presen
+tat
+ion mat
+erials prepared and
+t
+est
+ed
+[ ] Backup plans ready for demo day
+12. Reso
+urce Recommendat
+ions
+12.1 Essen
+t
+ial Too
+ls
+Database Managemen
+t
+MySQL Workbench or pgAdmin: Visual database design and managemen
+DBeaver: Universal database cl
+t
+ien
+for devel
+opmen
+t and
+t
+est
+ing
+Command Line Too
+ls: MySQL/Post
+greSQL command l
+ine cl
+ien
+ts
+Design and Doc
+umen
+tat
+ion
+draw.io: Free ER diagram creat
+ion
+Lu
+cidchart: Professional diagramming (free stu
+den
+t acco
+u
+n
+ts)
+ERDPlus:
+l
+n
+O
+ine ER diagram t
+oo
+l specifically for database design
+No
+t
+ion or Conflu
+ence: Team doc
+umen
+tat
+ion and co
+llaborat
+ion
+Devel
+opmen
+t and Test
+ing
+Gi
+t
+/Gi
+tHu
+b: Version con
+tro
+l for SQL scripts and doc
+umen
+VS Code: Text
+t
+t
+edi
+or wi
+h SQL ext
+ensions
+Postman: API t
+est
+ing if b
+u
+tat
+ion
+JMe
+t
+er: Performance
+i
+lding web in
+t
+erface
+t
+est
+ing for database qu
+eries
+12.2 Learning Reso
+urces
+t
+Database Design
+"Database Syst
+em Concepts" by Si
+lberschatz, Kort
+h, and S
+u
+"Designing Data-In
+t
+ensive Appl
+icat
+ions" by Mart
+in Kleppmann
+S
+tanford CS145 Database Co
+urse Mat
+erials (avai
+lable on
+l
+ine)
+MIT 6.830 Database Syst
+ems Co
+urse Mat
+erials
+darshan
+SQL and Q
+u
+ery
+pt
+O
+imizat
+ion
+"SQL Performance Explained" by Markus Winand
+"Learning SQL" by
+lan Beaul
+u
+ie
+MySQL or Post
+greSQL official doc
+umen
+tat
+ion
+SQLBo
+lt
+t
+in
+erac
+t
+ive SQL tut
+orial
+A
+Projec
+t Managemen
+t
+"The My
+t
+hical Man-Mon
+t
+h" by Frederick
+Agi
+le projec
+t managemen
+t tut
+orials
+Gi
+tHu
+b projec
+t managemen
+t
+features
+Team commu
+nicat
+ion best prac
+t
+ices
+Broo
+ks
+13. Final Tho
+u
+gh
+ts: From Men
+t
+or t
+o Team
+13.1 Keys t
+o S
+u
+ccess
+S
+tart
+Simple, B
+u
+ild Complexi
+t
+y Grad
+ually
+Don't try
+t
+o implemen
+t
+every
+t
+hing at
+once. S
+tart wi
+t
+u
+h basic f
+t
+nc
+ional
+t
+i
+y and add features i
+t
+erat
+ively. This approach helps
+u
+t
+yo
+iden
+ify problems early and ensures yo
+u
+have a work
+ing syst
+em even if yo
+u ru
+n o
+ut
+t
+of
+ime for advanced features.
+Commu
+nicat
+ion is Yo
+ur Most Importan
+t
+l
+Too
+More projec
+ts fai
+l d
+u
+t
+e
+o commu
+nicat
+ion problems t
+han
+decisions, and make sure everyone
+u
+nderstands t
+he c
+urren
+t
+echnical challenges. Have reg
+ular check-ins, doc
+umen
+t
+t stat
+e of
+t
+he projec
+t.
+Design for Yo
+ur Demo
+Every
+t
+hing yo
+u
+u
+b
+i
+ld sho
+uld support a compell
+ing demonstrat
+ion. If a feature won't
+support t
+he demo narrat
+ive, consider whe
+t
+her i
+t's wort
+h implemen
+t
+ing.
+be shown in
+t
+he demo or doesn't
+Q
+uali
+t
+y
+It's be
+u
+core f
+O
+ver Q
+uan
+t
+t
+i
+y
+tt
+er t
+o have fewer features t
+hat work perfec
+tly
+t
+han many features t
+hat are b
+u
+t
+nc
+ional
+t
+i
+y extremely well.
+ggy or incomple
+t
+e. Foc
+us on doing
+t
+he
+13.2
+Beyond
+t
+he Grade
+This Projec
+t
+is Port
+fo
+lio-Wort
+hy
+A well-exec
+ut
+ed research paper database syst
+em is some
+t
+hing yo
+u
+demonstrat
+es real-world database design sk
+i
+lls t
+hat are high
+ly valu
+can pro
+u
+dly show t
+o po
+ed in ind
+ustry.
+t
+en
+t
+ial empl
+oyers. It
+The Skills Transfer t
+o Ind
+ustry
+Every
+t
+hing yo
+u learn in
+t
+his projec
+t
+- database design, normal
+izat
+ion, qu
+appl
+ies t
+o professional sof
+tware devel
+opmen
+t. Take i
+t serio
+usly and yo
+ery opt
+imizat
+ion, t
+eam co
+u'll be be
+tt
+er prepared for yo
+llaborat
+ion - direc
+tly
+ur career.
+Consider
+O
+pen So
+urce
+If yo
+ur projec
+t turns o
+managemen
+t t
+oo
+ls, and yo
+ut well, consider mak
+ur work co
+ing i
+t
+open so
+urce. A
+uld make a real difference.
+cademic inst
+tut
+i
+ions ac
+tually need be
+tt
+er research
+13.3 Emergency Pro
+t
+oco
+ls
+If Yo
+u Fall
+Behind Sched
+ule
+Foc
+u
+us on core f
+t
+nc
+ional
+t
+i
+y first
+Defer advanced features t
+o "f
+uture work"
+Simpl
+ify
+t
+he data model
+if necessary
+Prepare a scaled-back b
+ut
+comple
+t
+e demo
+If Team Members Aren't Con
+trib
+ut
+ing
+Address issu
+es early and direc
+tly
+Redistrib
+ut
+e
+tasks if necessary
+Doc
+umen
+t
+con
+trib
+ut
+ions clearly
+Have a conversat
+t
+ion wi
+h yo
+If Technical Problems Arise
+ur men
+t
+or/instru
+t
+c
+or
+Don't panic - ask for help early
+Have backup plans for risky features
+Foc
+us on what works rat
+her t
+han what's bro
+ken
+Remember t
+hat problem-so
+lving is part
+t
+of
+he learning process
+Remember: The goal isn't
+j
+ust t
+o comple
+t
+e a projec
+t, b
+ut t
+o
+Approach
+t
+his projec
+t wi
+t
+h professionalism, c
+uriosi
+t
+y, and co
+grade.
+learn valuable skills and creat
+e some
+t
+hing yo
+llaborat
+ive spiri
+t, and yo
+u'll ge
+t
+far more o
+ut
+Good lu
+ck, and remember - yo
+ur men
+t
+or is here
+t
+o help when yo
+u
+need g
+u
+idance!
+u're pro
+u
+d of.
+of i
+t t
+han j
+ust a
+===============================================================================
+APPENDIX: OPENALEX WALDEN API INTEGRATION (November 2025)
+===============================================================================
+
+CiteMesh has been updated to use OpenAlex's new Walden rewrite (launched Nov 3, 2025).
+
+KEY CHANGES:
+- All OpenAlex API calls now use data-version=2 and include_xpac=true
+- Access to 190M+ additional works (datasets, software, dissertations)
+- Better metadata quality, OA detection, language detection
+- Faster API performance (10x improvement)
+
+TECHNICAL UPDATES:
+
+Frontend (citemesh-ui):
+  - NEW: /src/config/openalex.ts - Central API configuration
+  - UPDATED: /src/pages/PaperDetail.tsx - Uses Walden API
+  - Helper function: fetchFromOpenAlex() auto-injects Walden parameters
+
+Backend:
+  - UPDATED: /backend/app/api/search.py - All endpoints use Walden
+  - Added data-version=2 and include_xpac=true to all requests
+
+Benefits:
+  ✓ +190M new works (total: 270M+)
+  ✓ +5M datasets from DataCite
+  ✓ +1M software packages
+  ✓ +2M dissertations
+  ✓ Better citations and references
+  ✓ 95% language detection accuracy (was 80%)
+  ✓ 92% OA detection accuracy (was 85%)
+  ✓ Weekly updates (was monthly)
+
+COMING Q4 2025:
+  - PDF Download Endpoint (direct PDF access by DOI)
+  - Vector Search API (semantic similarity)
+  - Community Curation Portal
+  - Enhanced Funding Metadata
+
+DOCUMENTATION:
+  - WALDEN_API_UPDATE.md - Technical details
+  - WALDEN_INTEGRATION_SUCCESS.md - Success summary
+  - WALDEN_QUICK_REF.txt - Quick reference
+  - test_walden_api.sh - Test script
+
+Updated: November 10, 2025
+Status: ✅ DEPLOYED to https://citemesh.web.app
+

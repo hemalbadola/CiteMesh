@@ -1,0 +1,1004 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valkorex Opportunity Scout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #010411;
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .content-section {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        #section-3 {
+            min-height: 200vh; /* Give more scroll space for the cards */
+            justify-content: flex-start;
+            padding-top: 25vh;
+        }
+        .section-1, .section-6 { text-align: center; }
+        .section-2, .section-4, .section-5 { text-align: left; }
+        .glass-panel {
+            background: rgba(59, 7, 100, 0.4); /* Darker purple tint */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .process-card, #solution-panel {
+            opacity: 0;
+            /* GSAP will control the transform and box-shadow for the pop-in effect */
+        }
+        .process-card {
+            max-width: 400px;
+            margin-bottom: 50vh; /* Space out the cards */
+        }
+        #solution-panel {
+            /* Use CSS variables for the glow, controlled by GSAP */
+            box-shadow: 0 0 var(--glow-blur, 0px) var(--glow-spread, 0px) rgba(147, 51, 234, var(--glow-opacity, 0));
+            transition: box-shadow 0.3s ease-out; /* Add a smooth transition for the hover effect */
+        }
+        #solution-panel:hover {
+            /* A more intense glow on hover */
+            box-shadow: 0 0 25px 6px rgba(147, 51, 234, 0.7);
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.3), inset 0 0 5px rgba(147, 51, 234, 0.2);
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(147, 51, 234, 0.6), inset 0 0 10px rgba(147, 51, 234, 0.4);
+        }
+        .secondary-button {
+            transition: all 0.3s ease;
+        }
+        .secondary-button:hover {
+             background-color: rgba(255, 255, 255, 0.1);
+        }
+        .console-card {
+            background: rgba(15, 15, 30, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 18px 50px rgba(15, 23, 42, 0.45);
+        }
+        .console-form {
+            display: grid;
+            gap: 1.25rem;
+            grid-template-columns: 1fr;
+        }
+        .console-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 0.75rem;
+            color: #E2E8F0;
+            padding: 0.9rem 1.1rem;
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
+        .console-input:focus {
+            border-color: rgba(147, 51, 234, 0.6);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: rgba(147, 51, 234, 0.15);
+            color: #C084FC;
+        }
+        .result-card {
+            background: rgba(15, 15, 30, 0.65);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 1.2rem;
+            padding: 1.75rem;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 40px rgba(59, 7, 100, 0.35);
+        }
+        .result-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.85rem;
+            font-size: 0.85rem;
+            color: #94A3B8;
+        }
+        .inline-link {
+            color: #C084FC;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .inline-link:hover {
+            color: #E9D5FF;
+        }
+        .status-indicator {
+            font-size: 0.85rem;
+            color: #A855F7;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-indicator.status-error .status-text {
+            color: #FCA5A5;
+        }
+        .status-indicator.status-success .status-text {
+            color: #6EE7B7;
+        }
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(148, 163, 184, 0.2);
+            border-top-color: #A855F7;
+            border-radius: 9999px;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="smooth-wrapper">
+        <div id="smooth-content">
+            <canvas id="bg-canvas"></canvas>
+            <main class="relative z-10">
+                <!-- SECTION 1: THE HOOK -->
+                <section id="section-1" class="content-section section-1">
+                    <h1 class="text-4xl md:text-7xl font-black uppercase tracking-wider text-white mb-4">
+                        CiteMesh <span class="text-purple-500">Research Intelligence</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-8">
+                        A living knowledge engine that turns open scholarly data into daily, citation-aware briefings for universities and research teams.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="#section-2" class="cta-button bg-purple-600 text-white font-bold py-3 px-8 rounded-full text-lg">
+                            Explore the Platform
+                        </a>
+                        <a href="#section-console" class="secondary-button border-2 border-slate-500 text-slate-300 font-bold py-3 px-8 rounded-full text-lg text-center">
+                            View Sample Brief
+                        </a>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: THE PROBLEM -->
+                <section id="section-2" class="content-section section-2">
+                    <div class="glass-panel max-w-lg">
+                        <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">Discovery Shouldn't Drain Your Research Hours.</h2>
+                        <ul class="space-y-4 text-slate-300 text-lg">
+                            <li class="pain-point opacity-0">Scattered repositories, publishers, and APIs to reconcile.</li>
+                            <li class="pain-point opacity-0">Opaque citation signals that obscure genuine influence.</li>
+                            <li class="pain-point opacity-0">Open-access policies changing faster than your literature reviews.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- SECTION 3: THE PROCESS (WHAT WE DO) -->
+                <section id="section-3" class="content-section">
+                     <div id="card-observe" class="glass-panel process-card">
+                         <h2 class="text-3xl font-bold text-white mb-2">We Ingest.</h2>
+                         <p class="text-slate-300">CiteMesh syncs live from OpenAlex, arXiv, and institutional feeds, mapping every new paper to your research landscape.</p>
+                     </div>
+                     <div id="card-orient" class="glass-panel process-card ml-auto text-right">
+                         <h2 class="text-3xl font-bold text-white mb-2">We Understand.</h2>
+                         <p class="text-slate-300">Gemini-powered translation aligns plain-language questions with citation filters, institutions, and concept taxonomies.</p>
+                     </div>
+                     <div id="card-decide" class="glass-panel process-card">
+                         <h2 class="text-3xl font-bold text-white mb-2">We Synthesize.</h2>
+                         <p class="text-slate-300">Our pipeline ranks by impact, aggregates open-access routes, and flags collaborations you might be missing.</p>
+                     </div>
+                     <div id="card-act" class="glass-panel process-card ml-auto text-right">
+                         <h2 class="text-3xl font-bold text-white mb-2">So You Can Lead.</h2>
+                         <p class="text-slate-300">Daily intelligence briefs, citation dashboards, and inline PDFs keep your teams ahead of funding calls and publication waves.</p>
+                     </div>
+                </section>
+
+                <!-- SECTION 4: THE SOLUTION -->
+                <section id="section-4" class="content-section section-4 flex items-center justify-center">
+                    <div id="solution-panel" class="glass-panel w-full max-w-4xl text-left">
+                        <div class="p-2 md:p-4">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between border-b border-slate-700/50 pb-4 mb-4">
+                                <div class="flex items-center gap-3">
+                                    <svg class="h-6 w-6 text-purple-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18.5a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0-5 0Z"/><path d="M15 3.5a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0-5 0Z"/><path d="M6.5 18.5 17.5 3.5"/></svg>
+                                    <h2 class="text-2xl md:text-4xl font-bold text-white">CiteMesh Morning Signal</h2>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-semibold text-slate-300">Scholarly Intelligence Desk</p>
+                                    <p class="text-xs text-slate-400">14 Oct 2025</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Main Content -->
+                            <p class="font-bold text-purple-500 mb-2 text-sm uppercase tracking-wider">Featured Breakthrough</p>
+                            <h3 class="text-3xl font-bold text-white mb-6">Reinforcement Learning Systems Now Outperform Classical Planning</h3>
+                            
+                            <!-- Details Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-400 mb-1">Institution Lead</p>
+                                    <p class="text-lg text-slate-200">University of Cambridge AI Lab</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-400 mb-1">Citation Velocity</p>
+                                    <p class="text-lg text-slate-200">+218 cites last 90 days</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-400 mb-1">Open Access</p>
+                                    <p class="text-lg text-slate-200">Green (arXiv, HAL)</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Item -->
+                            <div class="bg-slate-800/50 rounded-lg p-4 flex items-start gap-4 mb-6">
+                                 <svg class="h-5 w-5 text-purple-500 mt-1 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                                <div>
+                                    <h4 class="font-bold text-white">Action Recommended</h4>
+                                    <p class="text-slate-300 text-sm">Schedule a briefing with the robotics faculty to discuss co-authoring the companion benchmark. CiteMesh preloads annotated datasets and policy diffs.</p>
+                                </div>
+                            </div>
+
+                            <!-- CTA Button -->
+                            <div class="text-center">
+                                <a href="#section-6" class="inline-block bg-purple-600 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 hover:bg-purple-700 hover:scale-105">Launch CiteMesh Console &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4B: PLATFORM HIGHLIGHTS -->
+                <section id="section-4b" class="content-section section-4">
+                    <div class="w-full">
+                        <h2 class="text-3xl md:text-5xl font-bold text-white mb-8 text-center">Why Researchers Trust CiteMesh.</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div class="glass-panel">
+                                <h3 class="text-2xl font-bold text-white mb-2">Unified Discovery Mesh</h3>
+                                <p class="text-slate-300">Federates OpenAlex, arXiv, and institutional repositories into a citation-normalized knowledge graph updated hourly.</p>
+                            </div>
+                            <div class="glass-panel">
+                                <h3 class="text-2xl font-bold text-white mb-2">Gemini-Guided Routing</h3>
+                                <p class="text-slate-300">Transforms plain-language questions into precise filters, preserving researcher intent while removing manual syntax tweaks.</p>
+                            </div>
+                            <div class="glass-panel">
+                                <h3 class="text-2xl font-bold text-white mb-2">Embedded Open Access</h3>
+                                <p class="text-slate-300">Caches verified OA PDFs through our secure proxy so faculty never leave the portal to read or annotate groundbreaking work.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4B: PLATFORM HIGHLIGHTS -->
+                <section id="section-4b" class="content-section section-4">
+                    <div class="w-full">
+                        <h2 class="text-3xl md:text-5xl font-bold text-white mb-8 text-center">Why Researchers Trust CiteMesh.</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div class="glass-panel">
+                                <h3 class="text-2xl font-bold text-white mb-2">Unified Discovery Mesh</h3>
+                                <p class="text-slate-300">Federates OpenAlex, arXiv, and institutional repositories into a citation-normalized knowledge graph updated hourly.</p>
+                            </div>
+                            <div class="glass-panel">
+                                <h3 class="text-2xl font-bold text-white mb-2">Gemini-Guided Routing</h3>
+                                <p class="text-slate-300">Transforms plain-language questions into precise filters, preserving researcher intent while removing manual syntax tweaks.</p>
+                            </div>
+                            <div class="glass-panel">
+                                <h3 class="text-2xl font-bold text-white mb-2">Embedded Open Access</h3>
+                                <p class="text-slate-300">Caches verified OA PDFs through our secure proxy so faculty never leave the portal to read or annotate groundbreaking work.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4C: LIVE CONSOLE -->
+                <section id="section-console" class="content-section section-4">
+                    <div class="console-card w-full max-w-5xl mx-auto">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                            <div>
+                                <p class="tag mb-3">Live Prototype</p>
+                                <h2 class="text-3xl md:text-4xl font-bold text-white">Ask CiteMesh Anything</h2>
+                                <p class="text-slate-300 mt-2 max-w-xl">Run natural-language queries against the running backend. We translate your intent, call OpenAlex, and surface open-access links without leaving this page.</p>
+                            </div>
+                            <div class="status-indicator" id="console-status">
+                                <span class="spinner" hidden></span>
+                                <span class="status-text">Backend ready at <code class="text-slate-100">http://127.0.0.1:8000</code></span>
+                            </div>
+                        </div>
+
+                        <form id="citemesh-form" class="console-form mb-8">
+                            <label class="flex flex-col">
+                                <span class="text-sm text-slate-400 mb-2 uppercase tracking-widest">Research Question</span>
+                                <textarea id="query-input" class="console-input h-28 resize-none" placeholder="e.g. Find the most cited reinforcement learning papers since 2021 with open source implementations" required spellcheck="false"></textarea>
+                            </label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <label class="flex flex-col">
+                                    <span class="text-sm text-slate-400 mb-2 uppercase tracking-widest">Per Page</span>
+                                    <select id="per-page" class="console-input">
+                                        <option value="5">5 results</option>
+                                        <option value="10">10 results</option>
+                                        <option value="25">25 results</option>
+                                    </select>
+                                </label>
+                                <label class="flex flex-col">
+                                    <span class="text-sm text-slate-400 mb-2 uppercase tracking-widest">Page</span>
+                                    <input id="page" class="console-input" type="number" min="1" value="1">
+                                </label>
+                                <label class="flex flex-col">
+                                    <span class="text-sm text-slate-400 mb-2 uppercase tracking-widest">Preset Queries</span>
+                                    <select id="preset" class="console-input">
+                                        <option value="">Choose a preset</option>
+                                        <option value="Find the most cited reinforcement learning papers since 2021">Reinforcement Learning Since 2021</option>
+                                        <option value="Show me open access quantum computing papers from 2023 onwards">Quantum Computing OA 2023+</option>
+                                        <option value="List top collaborations between University of Florida and MIT in biomedicine">UF x MIT Biomed Collaborations</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                                <button type="button" id="clear-button" class="secondary-button border-2 border-slate-600 text-slate-300 font-medium py-3 px-6 rounded-lg">Clear</button>
+                                <button type="submit" class="cta-button bg-purple-600 text-white font-bold py-3 px-8 rounded-lg">Run Query</button>
+                            </div>
+                        </form>
+
+                        <div id="results-wrapper" class="space-y-6" aria-live="polite">
+                            <p class="text-slate-400" id="results-placeholder">Run a query to see CiteMesh synthesize live intelligence.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 5: THE IMPACT -->
+                <section id="section-5" class="content-section section-5">
+                     <div class="w-full">
+                        <h2 class="text-3xl md:text-5xl font-bold text-white mb-8 text-center">Impact Across Campuses &amp; Labs.</h2>
+                         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                             <div class="glass-panel text-center">
+                                 <h3 class="impact-number text-purple-500 text-4xl font-bold mb-2">88%</h3>
+                                 <p class="text-lg font-semibold text-white">Faster Literature Scans</p>
+                                 <p class="text-slate-400 mt-1">Graduate Research Cohorts</p>
+                             </div>
+                              <div class="glass-panel text-center">
+                                 <h3 class="impact-number text-purple-500 text-4xl font-bold mb-2">4.2x</h3>
+                                 <p class="text-lg font-semibold text-white">Increase in High-Impact Collaborations</p>
+                                 <p class="text-slate-400 mt-1">Institutional Partnerships</p>
+                             </div>
+                              <div class="glass-panel text-center">
+                                 <h3 class="impact-number text-purple-500 text-4xl font-bold mb-2">97%</h3>
+                                 <p class="text-lg font-semibold text-white">OA Access Within CiteMesh</p>
+                                 <p class="text-slate-400 mt-1">Faculty Reading Sessions</p>
+                             </div>
+                         </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 6: FINAL CTA -->
+                <section id="section-6" class="content-section section-6">
+                    <h2 class="text-4xl md:text-6xl font-black text-white mb-4">
+                        Ready to Orchestrate Your Institution's <span class="text-purple-500">Research Edge?</span>
+    </script>
+
+    <!-- Shader Code -->
+    <script type="x-shader/x-vertex" id="vertexShader">
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+        void main() {
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vNormal = normalize(normalMatrix * normal);
+            vViewPosition = -mvPosition.xyz;
+            gl_Position = projectionMatrix * mvPosition;
+        }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        uniform vec3 color1;
+        uniform vec3 color2;
+        uniform float opacity;
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+        void main() {
+            vec3 normal = normalize(vNormal);
+            vec3 viewDir = normalize(vViewPosition);
+            float fresnel = 1.0 - dot(normal, viewDir);
+            fresnel = pow(fresnel, 2.5); // Rim effect power
+            vec3 finalColor = mix(color1, color2, fresnel);
+            // We multiply opacity by fresnel to make the center more transparent
+            gl_FragColor = vec4(finalColor, opacity * fresnel);
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
+        import { gsap } from 'gsap';
+        import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        let connections; // Declare connections here to make it available in the animate loop
+
+        // --- SCENE SETUP ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg-canvas'), alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.set(0, 0, 30);
+
+        // --- INTERACTIVITY ---
+        const mouse = new THREE.Vector2();
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // --- LIGHTING AND EFFECTS ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+        const composer = new EffectComposer(renderer);
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0;
+        bloomPass.strength = 1.6; // Increased strength for a more intense glow
+        bloomPass.radius = 0.4;
+        composer.addPass(renderScene);
+        composer.addPass(bloomPass);
+
+        // --- CORE 3D OBJECTS ---
+        const PARTICLE_COUNT = 10000;
+        const crystalGroup = new THREE.Group();
+        scene.add(crystalGroup);
+
+        const crystalGeom = new THREE.DodecahedronGeometry(10, 0);
+        const CRYSTAL_RADIUS = 10; // Define radius for calculations
+
+        // --- 1. PARTICLES ---
+        const particlesGeom = new THREE.BufferGeometry();
+        const positions = new Float32Array(PARTICLE_COUNT * 3);
+        const targetPositions = new Float32Array(PARTICLE_COUNT * 3);
+        
+        const dummyMesh = new THREE.Mesh(crystalGeom);
+        const sampler = new MeshSurfaceSampler(dummyMesh).build();
+        const tempPosition = new THREE.Vector3();
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const i3 = i * 3;
+            const pos = new THREE.Vector3().randomDirection().multiplyScalar(15 + Math.random() * 20);
+            positions[i3] = pos.x;
+            positions[i3 + 1] = pos.y;
+            positions[i3 + 2] = pos.z;
+            
+            sampler.sample(tempPosition);
+            targetPositions[i3] = tempPosition.x;
+            targetPositions[i3 + 1] = tempPosition.y;
+            targetPositions[i3 + 2] = tempPosition.z;
+        }
+        particlesGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeom.setAttribute('targetPosition', new THREE.BufferAttribute(targetPositions, 3));
+        
+        const initialRandomPositions = new Float32Array(positions);
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.08, color: 0xffffff, transparent: true,
+            blending: THREE.AdditiveBlending, depthWrite: false,
+        });
+        const particles = new THREE.Points(particlesGeom, particlesMaterial);
+        crystalGroup.add(particles);
+
+        // --- 2. GLOWING WEB (WIREFRAME) ---
+        const wireframeGeom = new THREE.WireframeGeometry(crystalGeom);
+        const wireframeMaterial = new THREE.LineBasicMaterial({
+            color: 0x9333ea, // Deeper Purple
+            transparent: true,
+            opacity: 0,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+        const wireframe = new THREE.LineSegments(wireframeGeom, wireframeMaterial);
+        crystalGroup.add(wireframe);
+
+        // --- 3. FINAL SOLID CRYSTAL (WITH SHADER) ---
+        const shaderMaterial = new THREE.ShaderMaterial({
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent,
+            uniforms: {
+                color1: { value: new THREE.Color(0x3b0764) }, // Dark purple core
+                color2: { value: new THREE.Color(0xd8b4fe) }, // Light purple glow
+                opacity: { value: 0.0 }
+            },
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+        const crystalMesh = new THREE.Mesh(crystalGeom, shaderMaterial);
+        crystalGroup.add(crystalMesh);
+        
+        // --- ANIMATION LOOP ---
+        const clock = new THREE.Clock();
+        function animate() {
+            const delta = clock.getDelta();
+            crystalGroup.rotation.y += 0.001;
+            
+            const smoothedMouseX = camera.position.x + (mouse.x * 2 - camera.position.x) * 0.05;
+            const smoothedMouseY = camera.position.y + (mouse.y * 2 - camera.position.y) * 0.05;
+
+            camera.position.x = smoothedMouseX;
+            camera.position.y = smoothedMouseY;
+            camera.lookAt(scene.position);
+
+            // --- Parallax Card and Line Movement ---
+            if (connections) {
+                connections.forEach(conn => {
+                    const line = conn.line;
+                    const card = conn.card;
+                    const popInTl = conn.popInTl;
+
+                    if (popInTl.progress() > 0) { // Only calculate for visible cards
+                        const parallaxX = -smoothedMouseX * 10;
+                        const parallaxY = -smoothedMouseY * 10;
+                        gsap.set(card, { x: parallaxX, y: parallaxY });
+
+                        const rect = card.getBoundingClientRect();
+                        const cardX = (rect.left + rect.width / 2) / window.innerWidth * 2 - 1;
+                        const cardY = -(rect.top + rect.height / 2) / window.innerHeight * 2 + 1;
+                        const cardWorldPos = new THREE.Vector3(cardX, cardY, 0.5).unproject(camera);
+
+                        const crystalWorldPos = new THREE.Vector3();
+                        crystalGroup.getWorldPosition(crystalWorldPos);
+                        const direction = cardWorldPos.clone().sub(crystalWorldPos).normalize();
+                        const worldSurfacePoint = crystalWorldPos.clone().add(direction.multiplyScalar(CRYSTAL_RADIUS));
+
+                        const posAttr = line.geometry.attributes.position;
+                        posAttr.setXYZ(0, worldSurfacePoint.x, worldSurfacePoint.y, worldSurfacePoint.z);
+                        posAttr.setXYZ(1, cardWorldPos.x, cardWorldPos.y, cardWorldPos.z);
+                        posAttr.needsUpdate = true;
+                    } else {
+                         gsap.set(card, { x: 0, y: 0 });
+                    }
+                });
+            }
+            
+            composer.render(delta);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- RESIZE HANDLER ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // --- UI SCROLL ANIMATIONS ---
+        gsap.utils.toArray('.pain-point').forEach((point, i) => {
+            gsap.fromTo(point, { opacity: 0, x: -20 }, {
+                opacity: 1, x: 0, duration: 0.5,
+                scrollTrigger: { trigger: '#section-2', start: 'top center', toggleActions: 'play none none reverse' },
+                delay: i * 0.2
+            });
+        });
+
+        // --- MAIN SCROLL-DRIVEN 3D TIMELINE ---
+        const tl = gsap.timeline({ paused: true });
+
+        // PART 1: Formation
+        tl.to(camera.position, { z: 25, ease: 'power1.inOut' }, 0);
+        
+        const animState = { progress: 0 };
+        tl.to(animState, {
+            progress: 1, duration: 4, ease: 'power1.inOut',
+            onUpdate: () => {
+                const positionsAttribute = particles.geometry.attributes.position;
+                const targetPosArray = particles.geometry.attributes.targetPosition.array;
+                
+                for (let i = 0; i < PARTICLE_COUNT; i++) {
+                    const i3 = i * 3;
+                    const p = new THREE.Vector3().fromArray(initialRandomPositions, i3);
+                    const t = new THREE.Vector3().fromArray(targetPosArray, i3);
+                    p.lerp(t, animState.progress);
+                    positionsAttribute.setXYZ(i, p.x, p.y, p.z);
+                }
+                positionsAttribute.needsUpdate = true;
+            }
+        }, 0);
+
+        tl.to(particles.material.color, { r: 0.57, g: 0.2, b: 0.91, duration: 4, ease: 'power1.in'}, 0); // Animate particles to Deeper Purple
+        tl.to(wireframe.material, { opacity: 0.5, duration: 2, ease: 'power1.in' }, 2);
+        tl.to(shaderMaterial.uniforms.opacity, { value: 1.0, duration: 3, ease: 'power2.inOut' }, 3);
+        tl.to(wireframe.material, { opacity: 0, duration: 2, ease: 'power1.out' }, 3.5);
+        tl.to(particles.material, { opacity: 0, duration: 2, ease: 'power1.out' }, 3.5);
+
+        // PART 2: Post-Locking Camera Movements
+        tl.to(crystalGroup.scale, { x: 1.2, y: 1.2, z: 1.2, ease: 'power1.inOut'}, 5);
+        tl.to(camera.position, { z: 40, ease: 'power1.inOut' }, 5);
+        tl.to(crystalGroup.position, { y: -5, ease: 'power1.inOut' }, 5);
+        tl.to(camera.position, { z: 30, ease: 'power1.inOut' }, 7);
+        tl.to(crystalGroup.position, { y: 0, ease: 'power1.inOut' }, 7);
+
+
+        // This block now controls the main timeline with the locking logic
+        const lockTime = 5.5; // Time when the crystal is fully solid and scaled.
+        let hasReachedLockPoint = false;
+        const tlDuration = tl.duration();
+        const timelineProgress = gsap.quickTo(tl, "progress", {
+            duration: 0.5,
+            ease: "power2.out"
+        });
+
+        ScrollTrigger.create({
+            trigger: "main",
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: 1.5,
+            onUpdate: self => {
+                let currentProgress = self.progress;
+                const lockProgressPoint = tlDuration > 0 ? lockTime / tlDuration : 0;
+
+                // Once the animation passes the lock point, set the flag
+                if (currentProgress >= lockProgressPoint) {
+                    hasReachedLockPoint = true;
+                }
+
+                // If the flag is set and we're trying to scroll back,
+                // force the animation to stay at the lock point.
+                if (hasReachedLockPoint && currentProgress < lockProgressPoint) {
+                    currentProgress = lockProgressPoint;
+                }
+                
+                timelineProgress(currentProgress);
+            }
+        });
+
+        // --- PROCESS CARDS & CONNECTING LINES ---
+        const cards = gsap.utils.toArray('.process-card');
+        connections = cards.map(card => {
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0xd8b4fe, // Light Purple
+                transparent: true,
+                opacity: 0,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            const linePoints = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+            const line = new THREE.Line(lineGeometry, lineMaterial);
+            scene.add(line);
+
+            const popInTl = gsap.timeline({ paused: true })
+                .fromTo(card, 
+                    { opacity: 0, scale: 0.95, y: 20 },
+                    {
+                        opacity: 1,
+                        scale: 1,
+                        y: 0,
+                        boxShadow: `0 0 25px 5px rgba(147, 51, 234, 0.7)`, // Deeper Purple
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    }
+                );
+            return { card, line, popInTl };
+        });
+
+        ScrollTrigger.create({
+            trigger: '#section-3',
+            start: 'top 80%',
+            end: 'bottom 20%',
+            scrub: true,
+            onUpdate: self => {
+                let activeIndex = -1;
+                let smallestDist = Infinity;
+                const triggerPoint = window.innerHeight * 0.4;
+                
+                connections.forEach((conn, index) => {
+                    const rect = conn.card.getBoundingClientRect();
+                    const dist = Math.abs(rect.top - triggerPoint);
+                    if (rect.top < window.innerHeight && rect.bottom > 0 && dist < smallestDist) {
+                        smallestDist = dist;
+                        activeIndex = index;
+                    }
+                });
+
+                connections.forEach((conn, index) => {
+                    const viewHeight = window.innerHeight;
+                    const rect = conn.card.getBoundingClientRect();
+                    const newProgress = gsap.utils.clamp(0, 1, gsap.utils.mapRange(viewHeight * 0.8, viewHeight * 0.3, 0, 1, rect.top));
+                    
+                    conn.popInTl.progress(newProgress);
+                    
+                    if (index === activeIndex) {
+                        conn.line.material.opacity = newProgress;
+                    } else {
+                        conn.line.material.opacity = 0;
+                    }
+                });
+            }
+        });
+
+        // --- SOLUTION PANEL ANIMATION ---
+        const solutionPanel = document.getElementById('solution-panel');
+        gsap.fromTo(solutionPanel,
+            { opacity: 0, y: 50 },
+            {
+                scrollTrigger: {
+                    trigger: solutionPanel,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                },
+                opacity: 1,
+                y: 0,
+                boxShadow: `0 0 25px 5px rgba(147, 51, 234, 0.7)`, // Deeper Purple
+                duration: 0.7,
+                ease: 'power2.out'
+            }
+        );
+
+
+        // --- IMPACT NUMBERS ANIMATION ---
+        gsap.utils.toArray('.impact-number').forEach(box => {
+            const targetText = box.textContent;
+            const parts = targetText.match(/([$]?)(\d+[,]?\d*)([.]?\d*)?([%M]?)/);
+            if (!parts) return;
+
+            const prefix = parts[1] || '';
+            const suffix = parts[4] || '';
+            const targetNum = parseFloat((parts[2] + (parts[3] || '')).replace(/,/g, ''));
+            
+            const counter = { val: 0 };
+
+            gsap.to(counter, {
+                val: targetNum,
+                duration: 2,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: box,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                },
+                onUpdate: () => {
+                    let displayText;
+                    if (targetText.includes(',')) {
+                        displayText = Math.round(counter.val).toLocaleString('en-US');
+                    } else if (targetText.includes('.')) {
+                        displayText = counter.val.toFixed(1);
+                    } else {
+                        displayText = Math.round(counter.val);
+                    }
+                    box.textContent = prefix + displayText + suffix;
+                }
+            });
+        });
+
+        // --- CITEMESH CONSOLE BINDINGS ---
+        const BACKEND_BASE_URL = (window.CITEMESH_BACKEND && window.CITEMESH_BACKEND.replace(/\/$/, '')) || 'http://127.0.0.1:8000';
+        const form = document.getElementById('citemesh-form');
+        if (form) {
+            const queryInput = document.getElementById('query-input');
+            const perPageSelect = document.getElementById('per-page');
+            const pageInput = document.getElementById('page');
+            const presetSelect = document.getElementById('preset');
+            const clearButton = document.getElementById('clear-button');
+            const statusIndicator = document.getElementById('console-status');
+            const spinner = statusIndicator?.querySelector('.spinner');
+            const statusText = statusIndicator?.querySelector('.status-text');
+            const resultsWrapper = document.getElementById('results-wrapper');
+            const placeholder = document.getElementById('results-placeholder');
+
+            const setStatus = (message, { loading = false, tone = 'neutral' } = {}) => {
+                if (!statusIndicator || !statusText) return;
+                statusIndicator.classList.remove('status-error', 'status-success');
+                if (tone === 'error') {
+                    statusIndicator.classList.add('status-error');
+                } else if (tone === 'success') {
+                    statusIndicator.classList.add('status-success');
+                }
+                statusText.innerHTML = message;
+                if (spinner) {
+                    spinner.hidden = !loading;
+                }
+            };
+
+            const formatNumber = value => {
+                if (typeof value !== 'number') return value;
+                return new Intl.NumberFormat('en-US').format(value);
+            };
+
+            const renderResults = body => {
+                if (!resultsWrapper) return;
+                resultsWrapper.innerHTML = '';
+
+                const resultPayload = body?.results?.results || [];
+                const openAlexMeta = body?.results?.meta || {};
+                const pagination = body?.pagination || {};
+
+                if (!resultPayload.length) {
+                    const emptyState = document.createElement('p');
+                    emptyState.className = 'text-slate-400';
+                    emptyState.textContent = 'No works found for this query. Adjust your filters or try another preset.';
+                    resultsWrapper.appendChild(emptyState);
+                    return;
+                }
+
+                const summary = document.createElement('div');
+                summary.className = 'text-slate-400 text-sm flex flex-wrap gap-3 items-center';
+                const totalCount = typeof openAlexMeta.count === 'number' ? formatNumber(openAlexMeta.count) : '—';
+                summary.innerHTML = `Showing ${resultPayload.length} results • Page ${pagination.page || 1} • OpenAlex total <span class="text-slate-200 font-semibold">${totalCount}</span>`;
+                resultsWrapper.appendChild(summary);
+
+                resultPayload.forEach(item => {
+                    const card = document.createElement('article');
+                    card.className = 'result-card';
+
+                    const title = document.createElement('h3');
+                    title.className = 'text-xl md:text-2xl font-semibold text-white mb-2';
+                    title.textContent = item.display_name || 'Untitled Work';
+                    card.appendChild(title);
+
+                    if (item.primary_location?.source?.display_name) {
+                        const venue = document.createElement('p');
+                        venue.className = 'text-slate-400 text-sm mb-3';
+                        venue.textContent = item.primary_location.source.display_name;
+                        card.appendChild(venue);
+                    }
+
+                    const metaEntries = [];
+                    if (item.publication_year) metaEntries.push(`<span>${item.publication_year}</span>`);
+                    if (typeof item.cited_by_count === 'number') metaEntries.push(`<span>${formatNumber(item.cited_by_count)} citations</span>`);
+                    if (item.open_access?.oa_status) metaEntries.push(`<span>OA: ${item.open_access.oa_status}</span>`);
+                    if (item.doi) metaEntries.push(`<span>DOI: <a class="inline-link" target="_blank" rel="noopener" href="${item.doi}">${item.doi.replace('https://', '')}</a></span>`);
+                    if (metaEntries.length) {
+                        const meta = document.createElement('div');
+                        meta.className = 'result-meta';
+                        meta.innerHTML = metaEntries.join('');
+                        card.appendChild(meta);
+                    }
+
+                    const actions = document.createElement('div');
+                    actions.className = 'mt-4 flex flex-wrap gap-3';
+
+                    const oaUrl = item.open_access?.oa_url;
+                    if (oaUrl) {
+                        const proxyUrl = `${BACKEND_BASE_URL}/pdf?url=${encodeURIComponent(oaUrl)}`;
+                        const proxyLink = document.createElement('a');
+                        proxyLink.href = proxyUrl;
+                        proxyLink.target = '_blank';
+                        proxyLink.rel = 'noopener';
+                        proxyLink.className = 'inline-flex items-center gap-2 bg-purple-600/80 hover:bg-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200';
+                        proxyLink.innerHTML = '<span>Open Cached PDF</span>';
+                        actions.appendChild(proxyLink);
+                    }
+
+                    if (item.id) {
+                        const openAlexLink = document.createElement('a');
+                        openAlexLink.href = item.id;
+                        openAlexLink.target = '_blank';
+                        openAlexLink.rel = 'noopener';
+                        openAlexLink.className = 'inline-flex items-center gap-2 border border-purple-500/40 text-purple-200 text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-200 hover:bg-purple-500/10';
+                        openAlexLink.textContent = 'View on OpenAlex';
+                        actions.appendChild(openAlexLink);
+                    }
+
+                    if (!actions.children.length) {
+                        const info = document.createElement('span');
+                        info.className = 'text-slate-500 text-sm';
+                        info.textContent = 'No open-access link detected for this work.';
+                        actions.appendChild(info);
+                    }
+
+                    card.appendChild(actions);
+                    resultsWrapper.appendChild(card);
+                });
+            };
+
+            const resetResults = () => {
+                if (resultsWrapper) {
+                    resultsWrapper.innerHTML = '';
+                    if (placeholder) {
+                        resultsWrapper.appendChild(placeholder);
+                        placeholder.hidden = false;
+                    }
+                }
+            };
+
+            presetSelect?.addEventListener('change', event => {
+                const value = event.target.value;
+                if (value && queryInput) {
+                    queryInput.value = value;
+                }
+            });
+
+            clearButton?.addEventListener('click', () => {
+                if (queryInput) queryInput.value = '';
+                if (presetSelect) presetSelect.value = '';
+                if (perPageSelect) perPageSelect.value = '5';
+                if (pageInput) pageInput.value = '1';
+                setStatus(`Backend ready at <code class="text-slate-100">${BACKEND_BASE_URL}</code>`, { loading: false });
+                resetResults();
+            });
+
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                if (!queryInput) return;
+                const query = queryInput.value.trim();
+                if (!query) {
+                    setStatus('Enter a research question to begin.', { tone: 'error' });
+                    return;
+                }
+
+                const payload = {
+                    query,
+                    per_page: Number(perPageSelect?.value || 5),
+                    page: Number(pageInput?.value || 1),
+                };
+
+                setStatus('Translating prompt via Gemini & querying OpenAlex…', { loading: true });
+                try {
+                    const response = await fetch(`${BACKEND_BASE_URL}/search`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+
+                    if (!response.ok) {
+                        let detailMessage = `${response.status} ${response.statusText}`;
+                        try {
+                            const errorJson = await response.json();
+                            if (errorJson?.detail) detailMessage = errorJson.detail;
+                        } catch (_) {
+                            /* swallow */
+                        }
+                        throw new Error(detailMessage);
+                    }
+
+                    const data = await response.json();
+                    placeholder && (placeholder.hidden = true);
+                    renderResults(data);
+                    const count = data?.results?.results?.length || 0;
+                    setStatus(`Fetched ${count} result${count === 1 ? '' : 's'} from CiteMesh backend.`, { tone: 'success' });
+                } catch (error) {
+                    resetResults();
+                    const message = error instanceof Error ? error.message : 'Unexpected error occurred.';
+                    setStatus(`Error: ${message}`, { tone: 'error' });
+                } finally {
+                    if (spinner) spinner.hidden = true;
+                }
+            });
+
+            setStatus(`Backend ready at <code class="text-slate-100">${BACKEND_BASE_URL}</code>`);
+        }
+
+    </script>
+</body>
+</html>
+
