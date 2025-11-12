@@ -11,6 +11,7 @@ from sqlalchemy import asc, desc
 from sqlmodel import Session, func, select
 
 from ..core.api_key_rotator import get_a4f_key, get_gemini_key
+from ..core.firebase_auth import FirebaseUser, get_current_user
 from ..db import get_session as get_db_session
 from ..models import ResearchChatMessage, ResearchChatSession, User
 
@@ -197,15 +198,18 @@ def call_a4f_api(messages: List[dict], system_prompt: Optional[str] = None) -> s
 @router.post("/sessions", response_model=SessionResponse)
 async def create_session(
     request: CreateSessionRequest,
-    user_id: int = 1,  # TODO: Get from auth
-    session: Session = Depends(get_db_session)
+    session: Session = Depends(get_db_session),
+    current_user: FirebaseUser = Depends(get_current_user)
 ):
     """
     Create a new chat session
     """
+    if current_user.db_user.id is None:
+        raise HTTPException(status_code=400, detail="User must be saved to database first")
+    
     try:
         chat_session = ResearchChatSession(
-            user_id=user_id,
+            user_id=current_user.db_user.id,
             title=request.title,
             system_prompt=request.system_prompt
         )
@@ -232,16 +236,19 @@ async def create_session(
 
 @router.get("/sessions", response_model=List[SessionResponse])
 async def list_sessions(
-    user_id: int = 1,  # TODO: Get from auth
     limit: int = 50,
-    session: Session = Depends(get_db_session)
+    session: Session = Depends(get_db_session),
+    current_user: FirebaseUser = Depends(get_current_user)
 ):
     """
     List all chat sessions for a user
     """
+    if current_user.db_user.id is None:
+        return []
+    
     statement = (
         select(ResearchChatSession)
-        .where(ResearchChatSession.user_id == user_id)
+        .where(ResearchChatSession.user_id == current_user.db_user.id)
         .order_by(desc(SessionTable.c.updated_at))
         .limit(limit)
     )
@@ -282,8 +289,8 @@ async def list_sessions(
 @router.get("/sessions/{session_id}", response_model=SessionWithMessagesResponse)
 async def get_session(
     session_id: int,
-    user_id: int = 1,  # TODO: Get from auth
-    session: Session = Depends(get_db_session)
+    session: Session = Depends(get_db_session),
+    current_user: FirebaseUser = Depends(get_current_user)
 ):
     """
     Get a chat session with all its messages
@@ -293,7 +300,7 @@ async def get_session(
     if not chat_session:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    if chat_session.user_id != user_id:
+    if chat_session.user_id != current_user.db_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     # Get all messages
@@ -334,8 +341,8 @@ async def get_session(
 async def update_session(
     session_id: int,
     request: UpdateSessionRequest,
-    user_id: int = 1,  # TODO: Get from auth
-    session: Session = Depends(get_db_session)
+    session: Session = Depends(get_db_session),
+    current_user: FirebaseUser = Depends(get_current_user)
 ):
     """
     Update a chat session
@@ -345,7 +352,7 @@ async def update_session(
     if not chat_session:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    if chat_session.user_id != user_id:
+    if chat_session.user_id != current_user.db_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     if request.title is not None:
@@ -381,8 +388,8 @@ async def update_session(
 @router.delete("/sessions/{session_id}")
 async def delete_session(
     session_id: int,
-    user_id: int = 1,  # TODO: Get from auth
-    session: Session = Depends(get_db_session)
+    session: Session = Depends(get_db_session),
+    current_user: FirebaseUser = Depends(get_current_user)
 ):
     """
     Delete a chat session and all its messages
@@ -392,7 +399,7 @@ async def delete_session(
     if not chat_session:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    if chat_session.user_id != user_id:
+    if chat_session.user_id != current_user.db_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     # Delete all messages first
@@ -415,8 +422,8 @@ async def delete_session(
 async def send_message(
     session_id: int,
     request: SendMessageRequest,
-    user_id: int = 1,  # TODO: Get from auth
-    session: Session = Depends(get_db_session)
+    session: Session = Depends(get_db_session),
+    current_user: FirebaseUser = Depends(get_current_user)
 ):
     """
     Send a message in a chat session and get AI response
@@ -426,7 +433,7 @@ async def send_message(
     if not chat_session:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    if chat_session.user_id != user_id:
+    if chat_session.user_id != current_user.db_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     # Save user message
@@ -516,16 +523,23 @@ async def send_message(
 
 @router.get("/stats")
 async def get_chat_stats(
-    user_id: int = 1,  # TODO: Get from auth
-    session: Session = Depends(get_db_session)
+    session: Session = Depends(get_db_session),
+    current_user: FirebaseUser = Depends(get_current_user)
 ):
     """
     Get chat statistics for a user
     """
+    if current_user.db_user.id is None:
+        return {
+            "total_sessions": 0,
+            "total_messages": 0,
+            "last_chat_at": None
+        }
+    
     # Count sessions
     session_count_row = session.exec(
         select(func.count(SessionTable.c.id))
-        .where(ResearchChatSession.user_id == user_id)
+        .where(ResearchChatSession.user_id == current_user.db_user.id)
     ).first()
     session_count = _extract_scalar(session_count_row)
     
@@ -533,14 +547,14 @@ async def get_chat_stats(
     message_count_row = session.exec(
         select(func.count(MessageTable.c.id))
         .join(ResearchChatSession)
-        .where(ResearchChatSession.user_id == user_id)
+        .where(ResearchChatSession.user_id == current_user.db_user.id)
     ).first()
     message_count = _extract_scalar(message_count_row)
     
     # Get most recent session
     recent_session = session.exec(
         select(ResearchChatSession)
-        .where(ResearchChatSession.user_id == user_id)
+        .where(ResearchChatSession.user_id == current_user.db_user.id)
         .order_by(desc(SessionTable.c.updated_at))
         .limit(1)
     ).first()
