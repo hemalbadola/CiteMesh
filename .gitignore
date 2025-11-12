@@ -1,0 +1,47 @@
+# Python virtual environments
+**/.venv/
+**/venv/
+**/.env
+
+# Environment configuration
+hemal/backend/.env
+backend/.env
+citemesh-ui/.env
+
+# Firebase credentials
+**/serviceAccountKey.json
+**/*firebase*.json
+!firebase.json
+
+# Cache artifacts
+hemal/backend/cache/*.json
+
+# Database files
+backend/app.db
+backend/*.db
+
+# Bytecode
+**/__pycache__/
+**/*.py[cod]
+
+# Node modules
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/build/
+.firebase/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+backend/serviceAccountKey.base64.txt
+
+# PDF download scripts and data
+arxiv_index.json
+download_hf_to_spaces.py
+fast_download_hf_to_spaces.py
+setup_credentials.sh
+.git.backup*
