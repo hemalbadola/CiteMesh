@@ -1,0 +1,28 @@
+# Entity Inventory
+
+| Entity Name | Key Attributes | Example Values | Primary Key Type | Notes |
+|-------------|----------------|----------------|------------------|-------|
+| Paper | title, abstract, publication_year, doi, submission_status, created_at | "Scalable SQL for Research Repositories", "Explores query optimization strategies for citation graphs", 2024, "10.1234/abcd1234", "Under Review", `2024-08-12 10:35:00+00` | Surrogate (`paper_id` UUID) | DOI unique when provided; enforce CHECK on publication year; store status history separately |
+| Author | full_name, email, affiliation_id, orcid, h_index, created_at | "Hemal Badola", "hemal@gehu.edu", `inst_002`, "0000-0002-1825-0097", 14, `2024-07-01 09:00:00+00` | Surrogate (`author_id` UUID) | Email unique; support optional ORCID; maintain author metrics in separate fact table |
+| Institution | name, country, city, website_url, type | "Indian Institute of Technology Bombay", "India", "Mumbai", "https://iitb.ac.in", "University" | Surrogate (`institution_id` UUID) | Enforce unique name + city per institution; consider external accreditation reference |
+| Topic | name, description, parent_topic_id, created_at | "Machine Learning", "Algorithms enabling learning from data", `NULL`, `2024-01-15 12:00:00+00` | Surrogate (`topic_id` UUID) | Supports hierarchical topics via self-reference; enforce unique topic names |
+| Keyword | term, description, created_at | "Explainability", "Interpretability of AI models", `2024-06-07 08:45:00+00` | Surrogate (`keyword_id` UUID) | Lightweight tagging distinct from formal topics; may collapse into Topic if scope shrinks |
+| PublicationVenue | name, venue_type, publisher, issn_isbn, impact_factor | "ACM SIGMOD", "Conference", "ACM", "0736-1608", 8.5 | Surrogate (`venue_id` UUID) | Maintain unique ISSN/ISBN; link to ranking metadata |
+| PaperVersion | paper_id, version_number, submitted_at, submitted_by, file_uri, checksum, change_log | `paper_id` 1234, 2, `2024-09-18 11:20:00+00`, `author_id` 5678, "s3://papers/1234_v2.pdf", "abc123hash", "Addressed reviewer comments" | Surrogate (`version_id` UUID) | Maintains revision history; enforce unique (paper_id, version_number) |
+| PaperAuthor | paper_id, author_id, author_order, contribution_type | `paper_id` 1234, `author_id` 5678, 1, "Lead Author" | Composite (`paper_id`, `author_id`) | Junction table; order maintained for citation formatting |
+| PaperTopic | paper_id, topic_id, relevance_score, tagged_by | `paper_id` 1234, `topic_id` 9876, 0.82, `author_id` 4321 | Composite (`paper_id`, `topic_id`) | Junction table; consider additional weighting per tagging source |
+| PaperKeyword | paper_id, keyword_id | `paper_id` 1234, `keyword_id` 6543 | Composite (`paper_id`, `keyword_id`) | Junction table; optional if keyword entity retained |
+| Citation | citing_paper_id, cited_paper_id, citation_context, citation_type, created_at | `paper_id` 1234, `paper_id` 4321, "Extends methodology proposed by...", "Reference", `2024-09-01 10:00:00+00` | Surrogate (`citation_id` UUID) | Enforce unique (citing_paper_id, cited_paper_id, citation_type); allow self-citations |
+| Attachment | paper_id, attachment_type, file_uri, uploaded_by, uploaded_at | `paper_id` 1234, "Dataset", "s3://datasets/1234.csv", `author_id` 5678, `2024-08-01 09:45:00+00` | Surrogate (`attachment_id` UUID) | Holds supplemental material; enforce MIME validations |
+| Review | paper_id, reviewer_id, review_round, score, recommendation, comments, submitted_at | `paper_id` 1234, `reviewer_id` 9012, 1, 4.5, "Accept", "Strong contribution...", `2024-09-10 15:30:00+00` | Surrogate (`review_id` UUID) | Reviewer can be author or external; enforce unique (paper_id, reviewer_id, review_round) |
+| Reviewer | full_name, email, expertise_areas, institution_id, active_since | "Naincy Sharma", "naincy@example.edu", "['Databases','Networks']", `inst_005`, `2022-05-01` | Surrogate (`reviewer_id` UUID) | May overlap with Author; consider shared Person table in future |
+| UserAccount | username, email, role, last_login_at, status | "maaz_s", "maaz@example.edu", "DataArchitect", `2025-01-02 08:00:00+00`, "Active" | Surrogate (`user_id` UUID) | Supports internal team workflow; integrate with audit trail |
+| AuditLog | entity_name, entity_id, action, action_by, action_at, change_summary | "Paper", `paper_id` 1234, "UPDATE", `user_id` 7788, `2024-10-01 12:00:00+00`, "Updated abstract for clarity" | Surrogate (`audit_id` BIGSERIAL) | Append-only; critical for compliance and reproducibility |
+| TagSuggestion | paper_id, suggested_term, confidence_score, suggested_by, created_at | `paper_id` 1234, "Graph Databases", 0.67, `user_id` 7788, `2024-09-05 14:10:00+00` | Surrogate (`suggestion_id` UUID) | Supports ML-assisted metadata enrichment |
+| Notification | recipient_user_id, message, notification_type, seen_at, created_at | `user_id` 7788, "Your paper was accepted", "Workflow", `2024-09-20 10:15:00+00`, `2024-09-20 09:30:00+00` | Surrogate (`notification_id` UUID) | Optional for MVP; track seen_at for UX metrics |
+| Task | title, description, assigned_to, due_date, status, related_entity, related_id | "Finalize ERD", "Ensure all junction tables documented", `user_id` 8899, `2024-10-15`, "In Progress", "Paper", `paper_id` 1234 | Surrogate (`task_id` UUID) | Supports project management; may live outside core DBMS scope |
+
+## Notes
+- Consider consolidating `Author` and `Reviewer` into a unified `Person` entity if role overlap becomes significant.
+- `UserAccount`, `Notification`, and `Task` support project operations; include only if in-scope for MVP.
+- Evaluate data retention policies for `AuditLog` and `Notification` to manage storage footprint.
