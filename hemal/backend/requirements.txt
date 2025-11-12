@@ -1,0 +1,9 @@
+anyio
+black
+fastapi
+flake8
+httpx
+mypy
+psycopg[binary]
+pytest
+uvicorn[standard]
