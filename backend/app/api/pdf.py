@@ -1,9 +1,11 @@
 """
-PDF API endpoints for on-demand paper PDF downloads
+PDF API endpoints for on-demand paper PDF downloads and proxying
 """
 from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import StreamingResponse, RedirectResponse
 from pydantic import BaseModel
 from typing import Optional
+import httpx
 
 from ..services.pdf_service import get_pdf_url
 
@@ -97,4 +99,99 @@ async def check_pdf_availability(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to check PDF: {str(e)}"
+        )
+
+
+@router.get("")
+async def proxy_pdf(
+    url: str = Query(..., description="Open Access PDF URL to proxy")
+):
+    """
+    Proxy and stream a PDF from OpenAlex or other open access sources
+    
+    This endpoint allows viewing PDFs without CORS issues and provides
+    proper content-type headers for browser PDF viewers.
+    
+    Example:
+        GET /api/pdf?url=https://arxiv.org/pdf/2301.12345.pdf
+    """
+    try:
+        # Validate URL (basic security check)
+        if not url.startswith(('http://', 'https://')):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid PDF URL - must start with http:// or https://"
+            )
+        
+        # Check if it's a known safe domain
+        safe_domains = [
+            'arxiv.org',
+            'europepmc.org', 
+            'ncbi.nlm.nih.gov',
+            'biorxiv.org',
+            'medrxiv.org',
+            'digitaloceanspaces.com',
+            'openalex.org',
+            's3.amazonaws.com'
+        ]
+        
+        from urllib.parse import urlparse
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc.lower()
+        
+        # Check if domain matches any safe domain
+        is_safe = any(safe_domain in domain for safe_domain in safe_domains)
+        
+        if not is_safe:
+            # For unknown domains, just redirect to let browser handle it
+            return RedirectResponse(url=url, status_code=302)
+        
+        # Stream the PDF through our server
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+            response = await client.get(
+                url,
+                headers={
+                    'User-Agent': 'CiteMesh/1.0 (Academic Research Tool; mailto:support@citemesh.app)'
+                }
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"Failed to fetch PDF: HTTP {response.status_code}"
+                )
+            
+            # Check if it's actually a PDF
+            content_type = response.headers.get('content-type', '').lower()
+            if 'pdf' not in content_type and 'octet-stream' not in content_type:
+                # Not a PDF, redirect to original URL
+                return RedirectResponse(url=url, status_code=302)
+            
+            # Stream the PDF with proper headers
+            return StreamingResponse(
+                iter([response.content]),
+                media_type='application/pdf',
+                headers={
+                    'Content-Disposition': 'inline',
+                    'Cache-Control': 'public, max-age=86400',  # Cache for 1 day
+                    'Accept-Ranges': 'bytes'
+                }
+            )
+            
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504,
+            detail="PDF download timed out - try opening the PDF directly"
+        )
+    except httpx.RequestError as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Failed to fetch PDF: {str(e)}"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal error proxying PDF: {str(e)}"
         )
