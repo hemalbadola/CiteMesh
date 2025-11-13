@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
 
-from .api import activity, chat, citations, collections, papers, pdf, search, users
+from .api import activity, chat, citations, collections, mentor, papers, pdf, search, users
 from .db import engine
 from .models import (
     CitationLink,
@@ -12,6 +12,19 @@ from .models import (
     MentorStudentLink,
     Profile,
     User,
+)
+
+# Import enhanced models for DBMS showcase
+from .models_enhanced import (
+    SearchCache,
+    SearchHistory,
+    PaperTopic,
+    ResearchTopic,
+    PaperReference,
+    ChatPaperContext,
+    QueryPerformanceLog,
+    PaperSimilarity,
+    TrendingTopic,
 )
 
 
@@ -60,3 +73,4 @@ app.include_router(citations.router, prefix="/api/citations", tags=["citations"]
 app.include_router(search.router, prefix="/api/search", tags=["search"])
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 app.include_router(pdf.router, prefix="/api/pdf", tags=["pdf"])
+app.include_router(mentor.router, prefix="/api/mentor", tags=["mentor"])

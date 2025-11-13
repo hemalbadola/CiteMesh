@@ -8,7 +8,10 @@ from app.core.api_key_rotator import get_gemini_key
 from app.core.firebase_auth import FirebaseUser, get_current_user
 from app.db import get_session
 from app.models import SavedPaper
+from app.services.search_cache import SearchCacheService, SearchHistoryService
+from app.services.paper_enrichment import PaperEnrichmentService
 import json
+import time
 
 router = APIRouter()
 
@@ -243,9 +246,16 @@ def parse_openalex_work(work: Dict[str, Any]) -> SearchResult:
 async def search_papers(
     request: SearchRequest,
     current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
 ):
     """
     Search for academic papers using OpenAlex API with optional AI query enhancement
+    
+    DBMS SHOWCASE FEATURES:
+    - Search result caching with TTL (reduces API calls)
+    - Search history tracking (user behavior analytics)
+    - Cache hit/miss tracking (performance metrics)
+    - Composite indexes for fast cache lookups
     
     Features:
     - Full-text and title search
@@ -256,7 +266,7 @@ async def search_papers(
     
     Requires authentication.
     """
-    start_time = datetime.now()
+    start_time = time.time()
     
     # Enhance query with AI if requested
     enhanced_query = None
@@ -267,72 +277,140 @@ async def search_papers(
         if enhanced_query:
             search_query = enhanced_query
     
-    # Build OpenAlex query parameters with Walden API
-    params = {
-        "search": search_query,
-        "page": request.page,
-        "per_page": request.per_page,
-        "mailto": OPENALEX_EMAIL,
-        "data-version": "2",  # Use new Walden rewrite (190M+ new works)
-        "include_xpac": "true"  # Include expanded content from DataCite
-    }
+    # Prepare filters dict for cache key
+    filters_dict = request.filters.dict() if request.filters else None
     
-    # Add filters
-    if request.filters:
-        filter_str = build_openalex_filter(request.filters)
-        if filter_str:
-            params["filter"] = filter_str
-        
-        # Add sorting
-        if request.filters.sort_by == "cited_by_count":
-            params["sort"] = "cited_by_count:desc"
-        elif request.filters.sort_by == "publication_date":
-            params["sort"] = "publication_date:desc"
+    # ===============================================
+    # DBMS FEATURE: Search Result Caching
+    # Check cache first before hitting OpenAlex API
+    # ===============================================
+    cached_results = SearchCacheService.get_cached_results(
+        session=session,
+        query=search_query,
+        filters=filters_dict,
+        page=request.page,
+        per_page=request.per_page
+    )
     
-    # Make request to OpenAlex
-    try:
-        response = requests.get(
-            f"{OPENALEX_BASE_URL}/works",
-            params=params,
-            timeout=30
-        )
-        response.raise_for_status()
-        data = response.json()
+    cache_hit = cached_results is not None
+    
+    if cached_results:
+        # Parse cached results
+        results = [SearchResult(**paper) for paper in cached_results.get("results", [])]
+        total_results = cached_results.get("total_results", 0)
+        data = cached_results  # Use cached data structure
+    else:
+        # Cache miss - query OpenAlex API
+        api_start_time = time.time()
         
-        # Parse results
-        results = []
-        for work in data.get("results", []):
-            try:
-                result = parse_openalex_work(work)
-                results.append(result)
-            except Exception as e:
-                print(f"Error parsing work: {e}")
-                continue
+        # Build OpenAlex query parameters with Walden API
+        params = {
+            "search": search_query,
+            "page": request.page,
+            "per_page": request.per_page,
+            "mailto": OPENALEX_EMAIL,
+            "data-version": "2",  # Use new Walden rewrite (190M+ new works)
+            "include_xpac": "true"  # Include expanded content from DataCite
+        }
         
-        # Calculate pagination
-        total_results = data.get("meta", {}).get("count", 0)
-        total_pages = (total_results + request.per_page - 1) // request.per_page
+        # Add filters
+        if request.filters:
+            filter_str = build_openalex_filter(request.filters)
+            if filter_str:
+                params["filter"] = filter_str
+            
+            # Add sorting
+            if request.filters.sort_by == "cited_by_count":
+                params["sort"] = "cited_by_count:desc"
+            elif request.filters.sort_by == "publication_date":
+                params["sort"] = "publication_date:desc"
         
-        # Calculate search time
-        search_time_ms = int((datetime.now() - start_time).total_seconds() * 1000)
+        # Make request to OpenAlex
+        try:
+            response = requests.get(
+                f"{OPENALEX_BASE_URL}/works",
+                params=params,
+                timeout=30
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            api_time_ms = int((time.time() - api_start_time) * 1000)
+            
+            # Parse results
+            results = []
+            for work in data.get("results", []):
+                try:
+                    result = parse_openalex_work(work)
+                    results.append(result)
+                except Exception as e:
+                    print(f"Error parsing work: {e}")
+                    continue
+            
+            # Calculate pagination
+            total_results = data.get("meta", {}).get("count", 0)
+            
+            # ===============================================
+            # DBMS FEATURE: Save to Cache
+            # Store results in database for future queries
+            # ===============================================
+            cache_data = {
+                "results": [r.dict() for r in results],
+                "total_results": total_results,
+                "meta": data.get("meta", {})
+            }
+            
+            SearchCacheService.save_to_cache(
+                session=session,
+                query=search_query,
+                filters=filters_dict,
+                results=cache_data,
+                page=request.page,
+                per_page=request.per_page,
+                api_response_time_ms=api_time_ms
+            )
         
-        return SearchResponse(
-            query=request.query,
-            enhanced_query=enhanced_query,
-            results=results,
-            total_results=total_results,
-            page=request.page,
-            per_page=request.per_page,
-            total_pages=total_pages,
-            search_time_ms=search_time_ms
-        )
-        
-    except requests.exceptions.Timeout:
-        raise HTTPException(status_code=504, detail="Search request timed out")
-    except requests.exceptions.RequestException as e:
-        raise HTTPException(status_code=502, detail=f"OpenAlex API error: {str(e)}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Search error: {str(e)}")
+        except requests.exceptions.Timeout:
+            raise HTTPException(status_code=504, detail="Search request timed out")
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=502, detail=f"OpenAlex API error: {str(e)}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Search error: {str(e)}")
+    
+    # Calculate pagination
+    total_results = len(results) if cache_hit else data.get("meta", {}).get("count", 0)
+    total_pages = (total_results + request.per_page - 1) // request.per_page
+    
+    # Calculate total search time
+    search_time_ms = int((time.time() - start_time) * 1000)
+    
+    # ===============================================
+    # DBMS FEATURE: Log Search History
+    # Track user search patterns for analytics
+    # ===============================================
+    SearchHistoryService.log_search(
+        session=session,
+        user_id=current_user.db_user.id,
+        query=request.query,
+        filters=filters_dict,
+        results_count=len(results),
+        page=request.page,
+        search_time_ms=search_time_ms,
+        use_ai_enhancement=request.use_ai_enhancement,
+        enhanced_query=enhanced_query,
+        cache_hit=cache_hit
+    )
+    
+    return SearchResponse(
+        query=request.query,
+        enhanced_query=enhanced_query,
+        results=results,
+        total_results=total_results,
+        page=request.page,
+        per_page=request.per_page,
+        total_pages=total_pages,
+        search_time_ms=search_time_ms
+    )
 
 
 @router.get("/suggest")
@@ -594,3 +672,237 @@ async def check_if_paper_saved(
         "saved": existing is not None,
         "saved_paper_id": existing.id if existing else None
     }
+
+
+# =========================================================================
+# DBMS SHOWCASE: ANALYTICS ENDPOINTS
+# These endpoints demonstrate advanced database queries and aggregations
+# =========================================================================
+
+@router.get("/analytics/cache-stats")
+async def get_cache_statistics(
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Get search cache performance statistics
+    
+    DBMS Concepts Demonstrated:
+    - Aggregate functions (COUNT, SUM, AVG)
+    - Multiple aggregations in single query
+    - Performance metrics calculation
+    """
+    stats = SearchCacheService.get_cache_statistics(session)
+    return stats
+
+
+@router.get("/analytics/trending-searches")
+async def get_trending_searches(
+    hours: int = Query(24, ge=1, le=168, description="Time window in hours"),
+    limit: int = Query(10, ge=1, le=50, description="Number of results"),
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Get trending search queries across all users
+    
+    DBMS Concepts Demonstrated:
+    - GROUP BY with aggregation
+    - Time-based filtering
+    - ORDER BY aggregate results
+    - HAVING clause for group filtering
+    """
+    trending = SearchHistoryService.get_trending_searches(
+        session=session,
+        hours=hours,
+        limit=limit
+    )
+    return {"trending_searches": trending}
+
+
+@router.get("/analytics/my-search-history")
+async def get_my_search_history(
+    limit: int = Query(50, ge=1, le=200, description="Number of results"),
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Get user's recent search history
+    
+    DBMS Concepts Demonstrated:
+    - SELECT with WHERE clause
+    - ORDER BY timestamp
+    - LIMIT for pagination
+    - Index usage (idx_search_history_user_time)
+    """
+    history = SearchHistoryService.get_user_search_history(
+        session=session,
+        user_id=current_user.db_user.id,
+        limit=limit
+    )
+    
+    return {
+        "history": [
+            {
+                "query": h.query_text,
+                "enhanced_query": h.enhanced_query,
+                "results_count": h.results_count,
+                "search_time_ms": h.search_time_ms,
+                "use_ai_enhancement": h.use_ai_enhancement,
+                "cache_hit": h.cache_hit,
+                "created_at": h.created_at.isoformat()
+            }
+            for h in history
+        ]
+    }
+
+
+@router.get("/analytics/my-search-stats")
+async def get_my_search_statistics(
+    days: int = Query(30, ge=1, le=365, description="Time window in days"),
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Get personalized search analytics for current user
+    
+    DBMS Concepts Demonstrated:
+    - Complex WHERE conditions with AND
+    - Multiple COUNT queries with different filters
+    - AVG aggregate function
+    - Percentage calculations
+    """
+    stats = SearchHistoryService.get_user_search_statistics(
+        session=session,
+        user_id=current_user.db_user.id,
+        days=days
+    )
+    return stats
+
+
+@router.post("/admin/cleanup-cache")
+async def cleanup_expired_cache(
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Remove expired cache entries (admin operation)
+    
+    DBMS Concepts Demonstrated:
+    - DELETE with WHERE condition
+    - Bulk delete operations
+    - Index usage for efficient deletion
+    """
+    # In production, this would be restricted to admin users
+    removed_count = SearchCacheService.cleanup_expired_cache(session)
+    
+    return {
+        "removed_entries": removed_count,
+        "message": f"Cleaned up {removed_count} expired cache entries"
+    }
+
+
+# =========================================================================
+# DBMS SHOWCASE: PAPER ENRICHMENT ENDPOINTS
+# Demonstrate normalized data storage and complex relationships
+# =========================================================================
+
+@router.post("/enrich/{saved_paper_id}")
+async def enrich_saved_paper(
+    saved_paper_id: int,
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Enrich a saved paper with topics and references from OpenAlex
+    
+    DBMS Concepts Demonstrated:
+    - Transaction management (all-or-nothing)
+    - M:N relationships (paper-topics)
+    - Foreign key constraints
+    - Normalized data storage
+    """
+    # Verify paper belongs to user
+    paper_stmt = select(SavedPaper).where(
+        SavedPaper.id == saved_paper_id,
+        SavedPaper.user_id == current_user.db_user.id
+    )
+    paper = session.exec(paper_stmt).first()
+    
+    if not paper:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Paper not found or not owned by user"
+        )
+    
+    # Enrich the paper
+    enrichment_stats = PaperEnrichmentService.enrich_paper(
+        session=session,
+        paper_id=saved_paper_id,
+        openalex_id=paper.paper_id
+    )
+    
+    return enrichment_stats
+
+
+@router.get("/paper/{saved_paper_id}/topics")
+async def get_paper_topics(
+    saved_paper_id: int,
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Get research topics for a paper
+    
+    DBMS Concepts Demonstrated:
+    - JOIN operation (PaperTopic → ResearchTopic)
+    - SELECT with ORDER BY
+    - Composite indexes for fast lookups
+    """
+    topics = PaperEnrichmentService.get_paper_topics(
+        session=session,
+        paper_id=saved_paper_id
+    )
+    
+    return {"topics": topics}
+
+
+@router.get("/paper/{saved_paper_id}/references")
+async def get_paper_references(
+    saved_paper_id: int,
+    limit: int = Query(50, ge=1, le=200),
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Get papers cited by this paper
+    
+    DBMS Concepts Demonstrated:
+    - Citation graph edges
+    - Directed relationships
+    - Pagination with LIMIT
+    """
+    references = PaperEnrichmentService.get_paper_references(
+        session=session,
+        paper_id=saved_paper_id,
+        limit=limit
+    )
+    
+    return {"references": references}
+
+
+@router.get("/analytics/topic-statistics")
+async def get_topic_statistics(
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Get statistics about research topics in the database
+    
+    DBMS Concepts Demonstrated:
+    - Aggregate functions (COUNT, AVG)
+    - GROUP BY for aggregation
+    - Multiple aggregation queries
+    """
+    stats = PaperEnrichmentService.get_topic_statistics(session)
+    return stats
