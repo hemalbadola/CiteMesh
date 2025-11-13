@@ -217,6 +217,7 @@ export interface SearchResponse {
 export const searchApi = {
   async search(
     query: string,
+    token: string,
     filters?: SearchFilters,
     page: number = 1,
     perPage: number = 10,
@@ -224,7 +225,10 @@ export const searchApi = {
   ): Promise<SearchResponse> {
     const response = await fetch(`${API_BASE_URL}/api/search/search`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
         query,
         filters,
@@ -236,13 +240,52 @@ export const searchApi = {
     return handleResponse<SearchResponse>(response);
   },
 
+  async savePaper(
+    paper: {
+      paper_id: string;
+      title: string;
+      authors?: string;
+      summary?: string;
+      published_year?: number;
+      venue?: string;
+      doi?: string;
+      pdf_url?: string;
+      cited_by_count?: number;
+      tags?: string;
+    },
+    token: string
+  ): Promise<Paper> {
+    const response = await fetch(`${API_BASE_URL}/api/search/save-paper`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(paper),
+    });
+    return handleResponse<Paper>(response);
+  },
+
+  async checkSaved(paperId: string, token: string): Promise<{ saved: boolean; saved_paper_id: number | null }> {
+    const response = await fetch(`${API_BASE_URL}/api/search/check-saved/${encodeURIComponent(paperId)}`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return handleResponse(response);
+  },
+
   async getSuggestions(query: string): Promise<{ original_query: string; suggestions: string[]; enhanced_query: string }> {
     const response = await fetch(`${API_BASE_URL}/api/search/suggest?query=${encodeURIComponent(query)}`);
     return handleResponse(response);
   },
 
-  async getStats(): Promise<{ total_papers: number; database: string; last_updated: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/search/stats`);
+  async getStats(token: string): Promise<{ total_papers: number; database: string; last_updated: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/search/stats`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`
+      }
+    });
     return handleResponse(response);
   },
 };

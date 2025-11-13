@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import { auth } from '../firebase'
+import api from '../services/api'
 import './PaperVerseConsole.css'
 
 type BackendStatusTone = 'neutral' | 'success' | 'error'
@@ -84,6 +86,8 @@ export default function PaperVerseConsole() {
   const [meta, setMeta] = useState<{ count?: number } | undefined>()
   const [pagination, setPagination] = useState<{ page?: number } | undefined>()
   const [hasFetched, setHasFetched] = useState(false)
+  const [savedPaperIds, setSavedPaperIds] = useState<Set<string>>(new Set())
+  const [savingPaperId, setSavingPaperId] = useState<string | null>(null)
 
   const testBackendConnection = useCallback(async () => {
     setStatus({ message: 'Testing backend connection…', tone: 'neutral', loading: true })
@@ -119,29 +123,34 @@ export default function PaperVerseConsole() {
     setStatus({ message: 'Translating prompt via Gemini & querying OpenAlex…', tone: 'neutral', loading: true })
 
     try {
-      const response = await fetch(`${backendBaseUrl}/api/search/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim(), per_page: perPage, page })
-      })
-
-      if (!response.ok) {
-        let detail = `${response.status} ${response.statusText}`
-        try {
-          const errorJson = (await response.json()) as { detail?: string }
-          if (errorJson.detail) detail = errorJson.detail
-        } catch {
-          /* ignore parse errors */
-        }
-        throw new Error(detail)
+      // Get Firebase token
+      const currentUser = auth.currentUser
+      if (!currentUser) {
+        throw new Error('You must be logged in to search')
       }
+      const token = await currentUser.getIdToken()
 
-      const data = (await response.json()) as SearchResponse
+      // Use api.ts search method
+      const data = await api.search.search(query.trim(), token, undefined, page, perPage, true)
+      
       const payload = data.results ?? []
       setResults(payload)
       setMeta({ count: data.total_results })
       setPagination({ page: data.page })
       setHasFetched(true)
+
+      // Check which papers are already saved
+      const savedChecks = await Promise.all(
+        payload.map(async (paper) => {
+          try {
+            const result = await api.search.checkSaved(paper.id, token)
+            return result.saved ? paper.id : null
+          } catch {
+            return null
+          }
+        })
+      )
+      setSavedPaperIds(new Set(savedChecks.filter((id): id is string => id !== null)))
 
       const count = payload.length
       setStatus({
@@ -156,6 +165,50 @@ export default function PaperVerseConsole() {
       setPagination(undefined)
       setHasFetched(true)
       setStatus({ message: `Error: ${message}`, tone: 'error', loading: false })
+    }
+  }
+
+  const handleSavePaper = async (paper: PaperVerseResult) => {
+    try {
+      setSavingPaperId(paper.id)
+      
+      const currentUser = auth.currentUser
+      if (!currentUser) {
+        throw new Error('You must be logged in to save papers')
+      }
+      const token = await currentUser.getIdToken()
+
+      // Prepare paper data
+      const authorsText = paper.authors.map(a => a.name).join(', ')
+      
+      await api.search.savePaper({
+        paper_id: paper.id,
+        title: paper.title,
+        authors: authorsText || undefined,
+        summary: paper.abstract || undefined,
+        published_year: paper.publication_year || undefined,
+        venue: paper.venue || undefined,
+        doi: paper.doi || undefined,
+        pdf_url: paper.pdf_url || undefined,
+        cited_by_count: paper.cited_by_count || undefined,
+      }, token)
+
+      // Update saved state
+      setSavedPaperIds(prev => new Set([...prev, paper.id]))
+      setStatus({
+        message: `✓ Saved "${paper.title.substring(0, 50)}..." to your library`,
+        tone: 'success',
+        loading: false
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save paper'
+      setStatus({
+        message: `Error saving paper: ${message}`,
+        tone: 'error',
+        loading: false
+      })
+    } finally {
+      setSavingPaperId(null)
     }
   }
 
@@ -307,7 +360,29 @@ export default function PaperVerseConsole() {
                 )}
               </div>
 
+              {item.abstract && (
+                <p className="pv-console__result-abstract">
+                  {item.abstract.substring(0, 300)}{item.abstract.length > 300 ? '...' : ''}
+                </p>
+              )}
+
               <div className="pv-console__result-actions">
+                {savedPaperIds.has(item.id) ? (
+                  <button
+                    className="pv-console__chip pv-console__chip--saved"
+                    disabled
+                  >
+                    ✓ Saved to Library
+                  </button>
+                ) : (
+                  <button
+                    className="pv-console__chip pv-console__chip--save"
+                    onClick={() => handleSavePaper(item)}
+                    disabled={savingPaperId === item.id}
+                  >
+                    {savingPaperId === item.id ? 'Saving...' : '+ Save to Library'}
+                  </button>
+                )}
                 {proxyUrl && (
                   <a href={proxyUrl} target="_blank" rel="noopener" className="pv-console__chip">
                     Open Access PDF

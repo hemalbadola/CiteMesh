@@ -1,9 +1,13 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 import requests
 from datetime import datetime
+from sqlmodel import Session, select
 from app.core.api_key_rotator import get_gemini_key
+from app.core.firebase_auth import FirebaseUser, get_current_user
+from app.db import get_session
+from app.models import SavedPaper
 import json
 
 router = APIRouter()
@@ -236,7 +240,10 @@ def parse_openalex_work(work: Dict[str, Any]) -> SearchResult:
 
 
 @router.post("/search", response_model=SearchResponse)
-async def search_papers(request: SearchRequest):
+async def search_papers(
+    request: SearchRequest,
+    current_user: FirebaseUser = Depends(get_current_user),
+):
     """
     Search for academic papers using OpenAlex API with optional AI query enhancement
     
@@ -246,6 +253,8 @@ async def search_papers(request: SearchRequest):
     - Advanced filtering (year, citations, authors, institutions)
     - Open access filtering
     - Relevance and citation-based sorting
+    
+    Requires authentication.
     """
     start_time = datetime.now()
     
@@ -451,9 +460,13 @@ async def get_trending_topics(
 
 
 @router.get("/stats")
-async def get_search_stats():
+async def get_search_stats(
+    current_user: FirebaseUser = Depends(get_current_user),
+):
     """
     Get OpenAlex database statistics
+    
+    Requires authentication.
     """
     try:
         response = requests.get(
@@ -474,3 +487,110 @@ async def get_search_stats():
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Stats error: {str(e)}")
+
+
+class SaveFromSearchRequest(BaseModel):
+    """Request to save a paper from search results"""
+    paper_id: str = Field(..., description="OpenAlex paper ID")
+    title: str = Field(..., min_length=1, max_length=1000)
+    authors: Optional[str] = Field(None, description="Comma-separated author names")
+    summary: Optional[str] = Field(None, description="Paper abstract")
+    published_year: Optional[int] = Field(None, ge=1900, le=2030)
+    venue: Optional[str] = Field(None, description="Publication venue")
+    doi: Optional[str] = None
+    pdf_url: Optional[str] = None
+    cited_by_count: Optional[int] = Field(None, ge=0)
+    tags: Optional[str] = Field(None, description="User tags (comma-separated)")
+
+
+class SavedPaperResponse(BaseModel):
+    """Response after saving a paper"""
+    id: int
+    user_id: int
+    paper_id: str
+    title: str
+    authors: Optional[str] = None
+    summary: Optional[str] = None
+    published_year: Optional[int] = None
+    tags: Optional[str] = None
+    saved_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+
+@router.post("/save-paper", response_model=SavedPaperResponse, status_code=status.HTTP_201_CREATED)
+async def save_paper_from_search(
+    request: SaveFromSearchRequest,
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Save a paper from search results to user's library
+    
+    This endpoint allows users to directly save papers they find in search results.
+    Includes all relevant metadata from OpenAlex.
+    """
+    if current_user.id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User must be saved to database first"
+        )
+    
+    # Check if paper already saved
+    statement = select(SavedPaper).where(
+        SavedPaper.user_id == current_user.id,
+        SavedPaper.paper_id == request.paper_id,
+    )
+    existing = session.exec(statement).first()
+    
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Paper already saved to your library"
+        )
+    
+    # Create saved paper record
+    saved_paper = SavedPaper(
+        user_id=current_user.id,
+        paper_id=request.paper_id,
+        title=request.title,
+        authors=request.authors,
+        summary=request.summary,
+        published_year=request.published_year,
+        tags=request.tags,
+    )
+    
+    session.add(saved_paper)
+    session.commit()
+    session.refresh(saved_paper)
+    
+    return SavedPaperResponse.model_validate(saved_paper)
+
+
+@router.get("/check-saved/{paper_id}")
+async def check_if_paper_saved(
+    paper_id: str,
+    current_user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Check if a paper is already saved in user's library
+    
+    Returns:
+        - saved: boolean
+        - saved_paper_id: database ID if saved, null otherwise
+    """
+    if current_user.id is None:
+        return {"saved": False, "saved_paper_id": None}
+    
+    statement = select(SavedPaper).where(
+        SavedPaper.user_id == current_user.id,
+        SavedPaper.paper_id == paper_id,
+    )
+    existing = session.exec(statement).first()
+    
+    return {
+        "saved": existing is not None,
+        "saved_paper_id": existing.id if existing else None
+    }
