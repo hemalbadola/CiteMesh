@@ -33,17 +33,6 @@ type PaperVerseResult = {
   relevance_score?: number
 }
 
-type SearchResponse = {
-  query: string
-  enhanced_query?: string
-  results: PaperVerseResult[]
-  total_results: number
-  page: number
-  per_page: number
-  total_pages: number
-  search_time_ms: number
-}
-
 const PRESETS = [
   {
     value: 'Find the most cited reinforcement learning papers since 2021',
