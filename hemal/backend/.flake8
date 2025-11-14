@@ -1,0 +1,15 @@
+[flake8]
+max-line-length = 120
+exclude = 
+    __pycache__,
+    .pytest_cache,
+    cache,
+    .env,
+    venv,
+    .venv
+ignore = 
+    E501,  # line too long
+    W291,  # trailing whitespace
+    W293,  # blank line contains whitespace
+    W292,  # no newline at end of file
+    F841,  # local variable assigned but never used
