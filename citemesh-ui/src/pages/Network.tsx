@@ -48,45 +48,26 @@ export default function Network() {
   useEffect(() => {
     if (!user) return;
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const token = await user.getIdToken();
+    // Mock data for showcase
+    const mockPapers = new Map<string, Paper>([
+      ['1', { id: '1', title: 'Attention Is All You Need', authors: ['Vaswani, A.'], year: 2017, cited_by_count: 98743 }],
+      ['2', { id: '2', title: 'BERT', authors: ['Devlin, J.'], year: 2019, cited_by_count: 67432 }],
+      ['3', { id: '3', title: 'GPT-3', authors: ['Brown, T.'], year: 2020, cited_by_count: 45678 }],
+      ['4', { id: '4', title: 'ResNet', authors: ['He, K.'], year: 2016, cited_by_count: 156234 }],
+      ['5', { id: '5', title: 'VGG', authors: ['Simonyan, K.'], year: 2015, cited_by_count: 89432 }],
+    ]);
 
-        // Fetch citations
-        const citationsResponse = await fetch('https://paperverse-kvw2y.ondigitalocean.app/api/citations/', {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
+    const mockCitations: Citation[] = [
+      { id: 1, source_paper_id: '2', target_paper_id: '1', citation_context: 'Based on transformer architecture' },
+      { id: 2, source_paper_id: '3', target_paper_id: '1', citation_context: 'Uses attention mechanism' },
+      { id: 3, source_paper_id: '3', target_paper_id: '2', citation_context: 'Builds on BERT' },
+      { id: 4, source_paper_id: '5', target_paper_id: '4', citation_context: 'Inspired by ResNet' },
+    ];
 
-        if (!citationsResponse.ok) throw new Error('Failed to fetch citations');
-        const citationsData = await citationsResponse.json();
-        setCitations(citationsData);
-
-        // Fetch papers
-        const papersResponse = await fetch('https://paperverse-kvw2y.ondigitalocean.app/api/papers/', {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-
-        if (!papersResponse.ok) throw new Error('Failed to fetch papers');
-        const papersData = await papersResponse.json();
-        
-        const papersMap = new Map<string, Paper>();
-        papersData.forEach((paper: Paper) => {
-          papersMap.set(paper.id, paper);
-        });
-        setPapers(papersMap);
-
-        // Build graph
-        buildGraph(citationsData, papersMap);
-      } catch (err) {
-        console.error('Error fetching network data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load network');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    setPapers(mockPapers);
+    setCitations(mockCitations);
+    buildGraph(mockCitations, mockPapers);
+    setLoading(false);
   }, [user]);
 
   const buildGraph = (citationsData: Citation[], papersMap: Map<string, Paper>) => {

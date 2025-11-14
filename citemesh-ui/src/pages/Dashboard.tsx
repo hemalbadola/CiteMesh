@@ -22,40 +22,57 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
 
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    // Mock data for showcase
+    setPaperStats({
+      total_papers: 12,
+      papers_by_year: { '2023': 5, '2024': 7 },
+      top_venues: [
+        { venue: 'NeurIPS', count: 4 },
+        { venue: 'ICML', count: 3 },
+      ],
+      recent_papers: 3,
+    });
 
-        // Fetch all stats in parallel
-        const [papers, collections, citations, activity] = await Promise.allSettled([
-          api.papers.getStats(),
-          api.collections.getStats(),
-          api.citations.getStats(),
-          api.activity.getRecent(1, 10),
-        ]);
+    setCollectionStats({
+      total_collections: 4,
+      total_papers_in_collections: 8,
+      public_collections: 1,
+      private_collections: 3,
+      most_used_collection: {
+        id: 1,
+        name: 'Machine Learning',
+        paper_count: 5,
+      },
+    });
 
-        if (papers.status === 'fulfilled') {
-          setPaperStats(papers.value);
-        }
-        if (collections.status === 'fulfilled') {
-          setCollectionStats(collections.value);
-        }
-        if (citations.status === 'fulfilled') {
-          setCitationStats(citations.value);
-        }
-        if (activity.status === 'fulfilled') {
-          setRecentActivity(activity.value);
-        }
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
+    setCitationStats({
+      total_citations: 15,
+      citations_this_month: 3,
+      most_cited_paper: {
+        paper_id: '1',
+        title: 'Attention Is All You Need',
+        citation_count: 5,
+      },
+    });
 
-    fetchDashboardData();
+    setRecentActivity([
+      {
+        id: 1,
+        user_id: 1,
+        activity_type: 'paper_added',
+        description: 'Added paper: BERT - Pre-training of Deep Bidirectional Transformers',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 2,
+        user_id: 1,
+        activity_type: 'collection_created',
+        description: 'Created collection: Deep Learning Papers',
+        created_at: new Date(Date.now() - 3600000).toISOString(),
+      },
+    ]);
+
+    setLoading(false);
   }, [user]);
 
   if (!user) return null;

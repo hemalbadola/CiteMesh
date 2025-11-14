@@ -37,39 +37,62 @@ export default function Library() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (authLoading) return; // Wait for auth to load
+    if (authLoading) return;
     
     if (!user) {
       navigate('/login');
       return;
     }
 
-    const fetchPapers = async () => {
-      try {
-        setLoading(true);
-        const token = await user.getIdToken();
-        const response = await fetch('https://paperverse-kvw2y.ondigitalocean.app/api/papers/', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+    // Mock data for showcase
+    const mockPapers: Paper[] = [
+      {
+        id: '1',
+        title: 'Attention Is All You Need',
+        authors: ['Vaswani, A.', 'Shazeer, N.', 'Parmar, N.'],
+        year: 2017,
+        venue: 'NeurIPS',
+        cited_by_count: 98743,
+        abstract: 'The dominant sequence transduction models are based on complex recurrent or convolutional neural networks...',
+        doi: '10.48550/arXiv.1706.03762',
+        pdf_url: 'https://arxiv.org/pdf/1706.03762.pdf',
+        is_open_access: true,
+        concepts: ['Transformers', 'Neural Networks', 'NLP'],
+        saved_at: new Date().toISOString(),
+      },
+      {
+        id: '2',
+        title: 'BERT: Pre-training of Deep Bidirectional Transformers',
+        authors: ['Devlin, J.', 'Chang, M.', 'Lee, K.'],
+        year: 2019,
+        venue: 'NAACL',
+        cited_by_count: 67432,
+        abstract: 'We introduce a new language representation model called BERT...',
+        doi: '10.18653/v1/N19-1423',
+        pdf_url: 'https://arxiv.org/pdf/1810.04805.pdf',
+        is_open_access: true,
+        concepts: ['BERT', 'Language Models', 'Transfer Learning'],
+        saved_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '3',
+        title: 'Deep Residual Learning for Image Recognition',
+        authors: ['He, K.', 'Zhang, X.', 'Ren, S.'],
+        year: 2016,
+        venue: 'CVPR',
+        cited_by_count: 156234,
+        abstract: 'Deeper neural networks are more difficult to train. We present a residual learning framework...',
+        doi: '10.1109/CVPR.2016.90',
+        pdf_url: null,
+        is_open_access: false,
+        concepts: ['ResNet', 'Computer Vision', 'Deep Learning'],
+        saved_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ];
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch papers');
-        }
-
-        const data = await response.json();
-        setPapers(data);
-        setFilteredPapers(data);
-      } catch (err) {
-        console.error('Error fetching papers:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load library');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPapers();
+    setPapers(mockPapers);
+    setFilteredPapers(mockPapers);
+    setLoading(false);
   }, [user, navigate, authLoading]);
 
   useEffect(() => {

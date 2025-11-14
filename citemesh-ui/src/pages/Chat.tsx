@@ -40,90 +40,81 @@ const Chat = () => {
       return;
     }
 
-    loadSessions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Mock sessions for showcase
+    const mockSessions: ChatSession[] = [
+      {
+        id: 1,
+        user_id: user.uid,
+        title: 'Research on Transformers',
+        model: 'gemini',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        message_count: 4,
+      },
+      {
+        id: 2,
+        user_id: user.uid,
+        title: 'Deep Learning Papers',
+        model: 'gemini',
+        created_at: new Date(Date.now() - 86400000).toISOString(),
+        updated_at: new Date(Date.now() - 86400000).toISOString(),
+        message_count: 2,
+      },
+    ];
+
+    setSessions(mockSessions);
+    setCurrentSession(mockSessions[0]);
+    
+    // Mock messages for first session
+    setMessages([
+      {
+        id: 1,
+        session_id: 1,
+        role: 'user',
+        content: 'Can you explain how transformers work?',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 2,
+        session_id: 1,
+        role: 'assistant',
+        content: 'Transformers are neural network architectures that use self-attention mechanisms to process sequential data. They were introduced in the "Attention Is All You Need" paper and have revolutionized NLP.',
+        created_at: new Date().toISOString(),
+      },
+    ]);
+    
+    setLoading(false);
   }, [user, navigate]);
 
-  const loadSessions = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch('https://paperverse-kvw2y.ondigitalocean.app/api/chat/sessions?page=1&page_size=50', {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error('Failed to load sessions');
-
-      const sessionList = await response.json();
-      setSessions(sessionList);
-      if (sessionList.length > 0) {
-        selectSession(sessionList[0]);
-      }
-    } catch (error) {
-      console.error('Error loading sessions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const selectSession = async (session: ChatSession) => {
-    if (!user) return;
-    
+  const selectSession = (session: ChatSession) => {
     setCurrentSession(session);
-    
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch(`https://paperverse-kvw2y.ondigitalocean.app/api/chat/sessions/${session.id}/messages`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error('Failed to load messages');
-
-      const messageList = await response.json();
-      setMessages(messageList);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      setMessages([]);
-    }
+    // In mock, messages are already loaded
   };
 
-  const createNewSession = async () => {
-    if (!user) return;
+  const createNewSession = () => {
+    const newSession: ChatSession = {
+      id: sessions.length + 1,
+      user_id: user?.uid || '',
+      title: 'New Chat',
+      model: selectedModel,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      message_count: 0,
+    };
     
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch('https://paperverse-kvw2y.ondigitalocean.app/api/chat/sessions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: 'New Chat',
-          model: selectedModel,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to create session');
-
-      const newSession = await response.json();
-      setSessions([newSession, ...sessions]);
-      selectSession(newSession);
-    } catch (error) {
-      console.error('Error creating session:', error);
-    }
+    setSessions([newSession, ...sessions]);
+    setCurrentSession(newSession);
+    setMessages([]);
   };
 
   const sendMessage = async () => {
-    if (!inputValue.trim() || !currentSession || isSending || !user) return;
+    if (!inputValue.trim() || !currentSession || isSending) return;
 
     const messageContent = inputValue;
     setInputValue('');
     setIsSending(true);
 
-    // Add user message optimistically
+    // Add user message
     const userMessage: ChatMessage = {
       id: Date.now(),
       session_id: currentSession.id,
@@ -133,34 +124,20 @@ const Chat = () => {
     };
     setMessages([...messages, userMessage]);
 
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch(`https://paperverse-kvw2y.ondigitalocean.app/api/chat/sessions/${currentSession.id}/messages`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: messageContent,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to send message');
-
-      const assistantMessage = await response.json();
+    // Mock assistant response after delay
+    setTimeout(() => {
+      const assistantMessage: ChatMessage = {
+        id: Date.now() + 1,
+        session_id: currentSession.id,
+        role: 'assistant',
+        content: `I understand you're asking about "${messageContent}". This is a mock response demonstrating the chat interface. In production, this would connect to AI models like Gemini or Claude to provide research assistance.`,
+        created_at: new Date().toISOString(),
+      };
       
-      // Add assistant response
       setMessages((prev) => [...prev, assistantMessage]);
-      
-      // Scroll to bottom
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      alert('Failed to send message');
-    } finally {
       setIsSending(false);
-    }
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
