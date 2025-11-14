@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import api, { StudentSummary, StudentAnalytics, MentorDashboardStats } from '../services/api';
 import './MentorDashboard.css';
 
 export default function MentorDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [dashboardStats, setDashboardStats] = useState<MentorDashboardStats | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<StudentAnalytics | null>(null);
@@ -14,18 +13,12 @@ export default function MentorDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [linkEmail, setLinkEmail] = useState('');
   const [linkingStudent, setLinkingStudent] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (authLoading) return;
-    
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    if (!user) return;
 
     loadData();
-  }, [user, navigate, authLoading]);
+  }, [user]);
 
   const loadData = async () => {
     if (!user) return;

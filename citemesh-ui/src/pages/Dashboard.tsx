@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth } from '../firebase';
+import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import PaperVerseConsole from '../components/PaperVerseConsole';
 import api, { type Activity, type PaperStats, type CollectionStats, type CitationStats } from '../services/api';
 import './Dashboard.css';
 
 export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const navigate = useNavigate();
   
   // API Data State
@@ -18,20 +17,6 @@ export default function Dashboard() {
   const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Set up auth state listener with loading state
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        // Only redirect to login if not loading (auth state is determined)
-        navigate('/login');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
 
   // Fetch dashboard data
   useEffect(() => {
@@ -206,6 +191,73 @@ export default function Dashboard() {
                 <p className="stat-value">
                   {loading ? '...' : collectionStats?.total_papers_in_collections ?? 0}
                 </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Feature Cards - Quick Access to All Features */}
+          <section className="features-section">
+            <h3 style={{ color: 'white', marginBottom: '1.5rem', fontSize: '1.25rem' }}>Quick Access</h3>
+            <div className="features-grid">
+              <div className="feature-card" onClick={() => navigate('/scholar-search')}>
+                <div className="feature-icon search-icon">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <h4>Search Papers</h4>
+                <p>Find research papers from 269M+ open access works</p>
+                <span className="feature-action">Start Searching →</span>
+              </div>
+
+              <div className="feature-card" onClick={() => navigate('/library')}>
+                <div className="feature-icon library-icon">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <h4>My Library</h4>
+                <p>Manage saved papers and organize collections</p>
+                <span className="feature-action">Open Library →</span>
+              </div>
+
+              <div className="feature-card" onClick={() => navigate('/network')}>
+                <div className="feature-icon network-icon">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="2"/>
+                    <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                    <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M8.59 13.51L15.42 17.49M15.41 6.51L8.59 10.49" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <h4>Citation Network</h4>
+                <p>Visualize connections between research papers</p>
+                <span className="feature-action">View Network →</span>
+              </div>
+
+              <div className="feature-card" onClick={() => navigate('/mentor')}>
+                <div className="feature-icon mentor-icon">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" strokeWidth="2"/>
+                    <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <h4>Mentor Dashboard</h4>
+                <p>Track student progress and research activity</p>
+                <span className="feature-action">View Students →</span>
+              </div>
+
+              <div className="feature-card" onClick={() => navigate('/chat')}>
+                <div className="feature-icon chat-icon">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <h4>AI Chat</h4>
+                <p>Ask questions and get research assistance</p>
+                <span className="feature-action">Start Chat →</span>
               </div>
             </div>
           </section>

@@ -11,21 +11,25 @@ import Library from './pages/Library.tsx'
 import Network from './pages/Network.tsx'
 import Chat from './pages/Chat.tsx'
 import MentorDashboard from './pages/MentorDashboard.tsx'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
+import { AuthProvider } from './contexts/AuthContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/scholar-search" element={<ScholarSearch />} />
-        <Route path="/library" element={<Library />} />
-        <Route path="/network" element={<Network />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/mentor" element={<MentorDashboard />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+          <Route path="/scholar-search" element={<ProtectedRoute><ScholarSearch /></ProtectedRoute>} />
+          <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+          <Route path="/network" element={<ProtectedRoute><Network /></ProtectedRoute>} />
+          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          <Route path="/mentor" element={<ProtectedRoute><MentorDashboard /></ProtectedRoute>} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 )

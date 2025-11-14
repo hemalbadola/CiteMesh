@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import './Network.css';
@@ -35,7 +34,7 @@ interface GraphEdge {
 }
 
 export default function Network() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [citations, setCitations] = useState<Citation[]>([]);
   const [papers, setPapers] = useState<Map<string, Paper>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -45,15 +44,9 @@ export default function Network() {
   const [edges, setEdges] = useState<GraphEdge[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (authLoading) return; // Wait for auth to load
-    
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    if (!user) return;
 
     const fetchData = async () => {
       try {
@@ -94,7 +87,7 @@ export default function Network() {
     };
 
     fetchData();
-  }, [user, navigate, authLoading]);
+  }, [user]);
 
   const buildGraph = (citationsData: Citation[], papersMap: Map<string, Paper>) => {
     const nodeMap = new Map<string, GraphNode>();
