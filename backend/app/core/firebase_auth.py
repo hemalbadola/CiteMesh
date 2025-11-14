@@ -38,7 +38,10 @@ except ValueError:
             # Priority 3: Default application credentials (Cloud Run, etc.)
             cred = credentials.ApplicationDefault()
     
-    firebase_admin.initialize_app(cred)
+    # Initialize with explicit project ID
+    firebase_admin.initialize_app(cred, {
+        'projectId': os.getenv("FIREBASE_PROJECT_ID", "citemesh")
+    })
 
 security = HTTPBearer()
 
