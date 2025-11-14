@@ -61,7 +61,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "message": "CiteMesh API is running"}
+    return {"status": "ok", "message": "CiteMesh API is running", "version": "1.0.1"}
 
 
 # Register API routers
