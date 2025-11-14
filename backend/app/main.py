@@ -61,7 +61,14 @@ app.add_middleware(
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "message": "CiteMesh API is running", "version": "1.0.1"}
+    import os
+    firebase_configured = bool(os.getenv("FIREBASE_SERVICE_ACCOUNT_BASE64") or os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH"))
+    return {
+        "status": "ok",
+        "message": "CiteMesh API is running",
+        "version": "1.0.2",
+        "firebase_configured": firebase_configured
+    }
 
 
 # Register API routers
