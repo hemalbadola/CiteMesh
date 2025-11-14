@@ -240,19 +240,6 @@ export default function Library() {
           </div>
         </div>
 
-        {error && (
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '12px',
-            padding: '1rem 1.5rem',
-            marginBottom: '1.5rem',
-            color: '#fca5a5'
-          }}>
-            <strong>Error:</strong> {error}
-          </div>
-        )}
-
         <div className="content-grid">
           {loading ? (
             <div className="library-loading">

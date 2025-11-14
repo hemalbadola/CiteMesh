@@ -287,12 +287,6 @@ export default function Network() {
           </div>
         </header>
 
-        {error && (
-          <div className="error-message">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
-
         <div className="network-container">
           {loading ? (
             <div className="network-loading">

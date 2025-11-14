@@ -46,7 +46,8 @@ export default function Dashboard() {
 
     setCitationStats({
       total_citations: 15,
-      citations_this_month: 3,
+      unique_papers: 8,
+      average_citations_per_paper: 1.9,
       most_cited_paper: {
         paper_id: '1',
         citation_count: 5,
