@@ -3,12 +3,12 @@ import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDXh5vH_QqK9fJ6LxZ2rVNkY8tQ3wE5mFo",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "citemesh.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "citemesh",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "citemesh.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "246567490878",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:246567490878:web:a0c9b8d7e6f5g4h3i2j1k0"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
