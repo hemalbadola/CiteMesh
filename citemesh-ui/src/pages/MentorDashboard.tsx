@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
-import api, { type StudentSummary, type StudentAnalytics, type MentorDashboardStats } from '../services/api';
+import { type StudentSummary, type StudentAnalytics, type MentorDashboardStats } from '../services/api';
 import './MentorDashboard.css';
 
 export default function MentorDashboard() {
@@ -10,7 +10,6 @@ export default function MentorDashboard() {
   const [dashboardStats, setDashboardStats] = useState<MentorDashboardStats | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<StudentAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [linkEmail, setLinkEmail] = useState('');
   const [linkingStudent, setLinkingStudent] = useState(false);
 
@@ -21,6 +20,7 @@ export default function MentorDashboard() {
     setDashboardStats({
       total_students: 0,
       active_students_last_7_days: 0,
+      inactive_students: 0,
       total_papers_saved: 0,
       papers_saved_this_week: 0,
       avg_papers_per_student: 0,
@@ -28,11 +28,6 @@ export default function MentorDashboard() {
     setStudents([]);
     setLoading(false);
   }, [user]);
-
-  const loadData = async () => {
-    // Mock function for now
-    setLoading(false);
-  };
 
   const handleLinkStudent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,16 +92,15 @@ export default function MentorDashboard() {
     const analytics: StudentAnalytics = {
       student_id: student.id,
       student_name: student.display_name || student.full_name || 'Student',
-      student_email: student.email,
       total_papers: student.papers_saved,
       total_citations: student.citations_made,
       total_collections: student.collections_created,
+      total_chat_sessions: student.chat_sessions,
       papers_last_7_days: 0,
       papers_last_30_days: student.papers_saved,
       avg_papers_per_week: 0,
       research_topics: [],
       last_activity: student.last_activity || new Date().toISOString(),
-      mentorship_started: student.mentorship_started,
     };
 
     setSelectedStudent(analytics);
@@ -130,12 +124,6 @@ export default function MentorDashboard() {
             <p className="subtitle-text">Track your students' research progress</p>
           </div>
         </header>
-
-        {error && (
-          <div className="error-message">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
 
         {/* Dashboard Stats */}
         {dashboardStats && (
