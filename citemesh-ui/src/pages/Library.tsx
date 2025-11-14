@@ -28,7 +28,6 @@ export default function Library() {
   const [papers, setPapers] = useState<Paper[]>([]);
   const [filteredPapers, setFilteredPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [sortType, setSortType] = useState<SortType>('saved-desc');

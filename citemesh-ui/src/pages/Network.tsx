@@ -38,7 +38,6 @@ export default function Network() {
   const [citations, setCitations] = useState<Citation[]>([]);
   const [papers, setPapers] = useState<Map<string, Paper>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null);
   const [nodes, setNodes] = useState<GraphNode[]>([]);
   const [edges, setEdges] = useState<GraphEdge[]>([]);

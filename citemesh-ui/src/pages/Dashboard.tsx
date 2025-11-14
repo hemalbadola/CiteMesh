@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import PaperVerseConsole from '../components/PaperVerseConsole';
-import api, { type Activity, type PaperStats, type CollectionStats, type CitationStats } from '../services/api';
+import { type Activity, type PaperStats, type CollectionStats, type CitationStats } from '../services/api';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -16,7 +16,6 @@ export default function Dashboard() {
   const [citationStats, setCitationStats] = useState<CitationStats | null>(null);
   const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Fetch dashboard data
   useEffect(() => {
@@ -50,7 +49,6 @@ export default function Dashboard() {
       citations_this_month: 3,
       most_cited_paper: {
         paper_id: '1',
-        title: 'Attention Is All You Need',
         citation_count: 5,
       },
     });
@@ -134,19 +132,6 @@ export default function Dashboard() {
             </div>
           </form>
         </div>
-
-        {error && (
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '12px',
-            padding: '1rem 1.5rem',
-            marginBottom: '1.5rem',
-            color: '#fca5a5'
-          }}>
-            <strong>Error loading dashboard data:</strong> {error}
-          </div>
-        )}
 
         <div className="content-grid">
           {/* Quick Stats */}
