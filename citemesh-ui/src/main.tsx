@@ -10,6 +10,7 @@ import ScholarSearch from './pages/ScholarSearch.tsx'
 import Library from './pages/Library.tsx'
 import Network from './pages/Network.tsx'
 import Chat from './pages/Chat.tsx'
+import MentorDashboard from './pages/MentorDashboard.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/library" element={<Library />} />
         <Route path="/network" element={<Network />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/mentor" element={<MentorDashboard />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

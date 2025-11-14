@@ -362,6 +362,96 @@ export const healthApi = {
   },
 };
 
+// Mentor API
+export interface StudentSummary {
+  id: number;
+  email: string;
+  full_name?: string;
+  display_name?: string;
+  papers_saved: number;
+  collections_created: number;
+  citations_made: number;
+  chat_sessions: number;
+  last_activity?: string;
+  mentorship_started: string;
+  activities_last_week: number;
+}
+
+export interface StudentAnalytics {
+  student_id: number;
+  student_name: string;
+  total_papers: number;
+  total_collections: number;
+  total_citations: number;
+  total_chat_sessions: number;
+  papers_last_7_days: number;
+  papers_last_30_days: number;
+  avg_papers_per_week: number;
+  most_active_day?: string;
+  research_topics: string[];
+  last_activity?: string;
+}
+
+export interface MentorDashboardStats {
+  total_students: number;
+  active_students_last_7_days: number;
+  inactive_students: number;
+  total_papers_saved: number;
+  papers_saved_this_week: number;
+  avg_papers_per_student: number;
+}
+
+export const mentorApi = {
+  async linkStudent(studentEmail: string, token: string): Promise<{ message: string; link_id: number; student_name: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/mentor/link-student`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ student_email: studentEmail }),
+    });
+    return handleResponse(response);
+  },
+
+  async unlinkStudent(studentId: number, token: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/mentor/unlink-student/${studentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    return handleResponse(response);
+  },
+
+  async getMyStudents(token: string): Promise<StudentSummary[]> {
+    const response = await fetch(`${API_BASE_URL}/api/mentor/my-students`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    return handleResponse(response);
+  },
+
+  async getStudentAnalytics(studentId: number, token: string): Promise<StudentAnalytics> {
+    const response = await fetch(`${API_BASE_URL}/api/mentor/student/${studentId}/analytics`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    return handleResponse(response);
+  },
+
+  async getDashboard(token: string): Promise<MentorDashboardStats> {
+    const response = await fetch(`${API_BASE_URL}/api/mentor/dashboard`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    return handleResponse(response);
+  },
+};
+
 export default {
   papers: papersApi,
   collections: collectionsApi,
@@ -370,4 +460,5 @@ export default {
   search: searchApi,
   chat: chatApi,
   health: healthApi,
+  mentor: mentorApi,
 };
