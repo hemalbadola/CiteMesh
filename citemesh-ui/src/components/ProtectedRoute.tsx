@@ -26,9 +26,8 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
             borderTopColor: '#6366f1',
             borderRadius: '50%',
             animation: 'spin 0.8s linear infinite',
-            margin: '0 auto 1rem'
+            margin: '0 auto'
           }}></div>
-          <p>Loading...</p>
         </div>
       </div>
     );

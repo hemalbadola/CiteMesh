@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
-import api, { StudentSummary, StudentAnalytics, MentorDashboardStats } from '../services/api';
+import api, { type StudentSummary, type StudentAnalytics, type MentorDashboardStats } from '../services/api';
 import './MentorDashboard.css';
 
 export default function MentorDashboard() {
