@@ -17,79 +17,99 @@ export default function MentorDashboard() {
   useEffect(() => {
     if (!user) return;
 
-    loadData();
+    // Mock data for showcase
+    setDashboardStats({
+      total_students: 0,
+      active_students_last_7_days: 0,
+      total_papers_saved: 0,
+      papers_saved_this_week: 0,
+      avg_papers_per_student: 0,
+    });
+    setStudents([]);
+    setLoading(false);
   }, [user]);
 
   const loadData = async () => {
-    if (!user) return;
-
-    try {
-      setLoading(true);
-      const token = await user.getIdToken();
-
-      const [studentsData, statsData] = await Promise.all([
-        api.mentor.getMyStudents(token),
-        api.mentor.getDashboard(token),
-      ]);
-
-      setStudents(studentsData);
-      setDashboardStats(statsData);
-    } catch (err) {
-      console.error('Error loading mentor data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load data');
-    } finally {
-      setLoading(false);
-    }
+    // Mock function for now
+    setLoading(false);
   };
 
   const handleLinkStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !linkEmail.trim()) return;
+    if (!linkEmail.trim()) return;
 
-    try {
-      setLinkingStudent(true);
-      const token = await user.getIdToken();
-      const result = await api.mentor.linkStudent(linkEmail, token);
+    setLinkingStudent(true);
+    
+    // Mock linking for showcase
+    setTimeout(() => {
+      const newStudent: StudentSummary = {
+        id: students.length + 1,
+        email: linkEmail,
+        display_name: linkEmail.split('@')[0],
+        full_name: linkEmail.split('@')[0].charAt(0).toUpperCase() + linkEmail.split('@')[0].slice(1),
+        papers_saved: 0,
+        collections_created: 0,
+        citations_made: 0,
+        chat_sessions: 0,
+        activities_last_week: 0,
+        last_activity: new Date().toISOString(),
+        mentorship_started: new Date().toISOString(),
+      };
+
+      setStudents([...students, newStudent]);
       
-      alert(`✅ ${result.student_name} linked successfully!`);
+      // Update stats
+      if (dashboardStats) {
+        setDashboardStats({
+          ...dashboardStats,
+          total_students: dashboardStats.total_students + 1,
+        });
+      }
+
+      alert(`✅ ${newStudent.full_name} (${linkEmail}) linked successfully!`);
       setLinkEmail('');
-      loadData(); // Refresh data
-    } catch (err) {
-      console.error('Error linking student:', err);
-      alert(`Failed to link student: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
       setLinkingStudent(false);
-    }
+    }, 500);
   };
 
   const handleUnlinkStudent = async (studentId: number, studentName: string) => {
-    if (!user) return;
-    
     if (!confirm(`Remove ${studentName} from your students list?`)) return;
 
-    try {
-      const token = await user.getIdToken();
-      await api.mentor.unlinkStudent(studentId, token);
-      
-      alert(`${studentName} unlinked successfully`);
-      loadData(); // Refresh data
-    } catch (err) {
-      console.error('Error unlinking student:', err);
-      alert('Failed to unlink student');
+    // Mock unlink for showcase
+    setStudents(students.filter(s => s.id !== studentId));
+    
+    // Update stats
+    if (dashboardStats) {
+      setDashboardStats({
+        ...dashboardStats,
+        total_students: dashboardStats.total_students - 1,
+      });
     }
+
+    alert(`${studentName} unlinked successfully`);
   };
 
   const viewStudentDetails = async (studentId: number) => {
-    if (!user) return;
+    const student = students.find(s => s.id === studentId);
+    if (!student) return;
 
-    try {
-      const token = await user.getIdToken();
-      const analytics = await api.mentor.getStudentAnalytics(studentId, token);
-      setSelectedStudent(analytics);
-    } catch (err) {
-      console.error('Error loading student analytics:', err);
-      alert('Failed to load student details');
-    }
+    // Mock analytics for showcase
+    const analytics: StudentAnalytics = {
+      student_id: student.id,
+      student_name: student.display_name || student.full_name || 'Student',
+      student_email: student.email,
+      total_papers: student.papers_saved,
+      total_citations: student.citations_made,
+      total_collections: student.collections_created,
+      papers_last_7_days: 0,
+      papers_last_30_days: student.papers_saved,
+      avg_papers_per_week: 0,
+      research_topics: [],
+      last_activity: student.last_activity || new Date().toISOString(),
+      mentorship_started: student.mentorship_started,
+    };
+
+    setSelectedStudent(analytics);
   };
 
   if (!user) return null;
