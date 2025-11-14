@@ -11,7 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: cd citemesh-ui && npm ci && npm run build
+      - name: Build with production environment
+        run: cd citemesh-ui && npm ci && npm run build
+        env:
+          VITE_BACKEND_URL: https://paperverse-kvw2y.ondigitalocean.app
+          VITE_FIREBASE_API_KEY: AIzaSyD_siEWuKuU04fY69ImUxbGwbN9txxKKj8
+          VITE_FIREBASE_AUTH_DOMAIN: citemesh.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: citemesh
+          VITE_FIREBASE_STORAGE_BUCKET: citemesh.firebasestorage.app
+          VITE_FIREBASE_MESSAGING_SENDER_ID: 63495277735
+          VITE_FIREBASE_APP_ID: 1:63495277735:web:f1b48fe795294e3ff89f82
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
