@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "citemesh-pbl",
+    "default": "citemesh",
     "host": "citemesh"
   },
   "targets": {},

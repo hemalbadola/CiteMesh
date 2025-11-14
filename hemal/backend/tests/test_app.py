@@ -22,7 +22,7 @@ def test_search_missing_query_field() -> None:
 
 def test_search_invalid_page() -> None:
     client = TestClient(app_module.app)
-    response = client.post("/search", json={"query": "ai", "page": 0})
+    response = client.post("/search", json={"query": "artificial intelligence", "page": 0})
     assert response.status_code == 400
     assert response.json()["detail"] == "'page' must be a positive integer"
 
@@ -82,7 +82,7 @@ def test_search_openalex_error(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(app_module.client, "fetch", fake_fetch)
 
-    response = client.post("/search", json={"query": "ok"})
+    response = client.post("/search", json={"query": "test query"})
     assert response.status_code == 502
     assert response.json()["detail"] == "boom"
 
